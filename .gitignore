@@ -1,3 +1,35 @@
+# Backend
+backend/target/
+backend/*.class
+backend/.settings/
+backend/.classpath
+backend/.project
+
+# Frontend
+frontend/node_modules/
+frontend/.expo/
+frontend/dist/
+frontend/build/
+frontend/*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Replit
+.upm/
+.cache/
+.config/
+
+# Environment
+.env
+*.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js (root level)
 node_modules/
 npm-debug.log
-.env
