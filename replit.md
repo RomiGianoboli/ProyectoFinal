@@ -1,229 +1,192 @@
 # DerWeParent - Sistema de Coordinación Parental
 
-## Descripción General
-Sistema integral de coordinación parental para gestionar actividades, fechas de custodia y comunicación entre padres/tutores.
+## Overview
 
-## Estado Actual del Proyecto
-El proyecto cuenta con la capa de modelo y persistencia completamente implementada. Backend Spring Boot funcionando con PostgreSQL y frontend PWA configurado.
+DerWeParent is a comprehensive parental coordination system designed to manage activities, custody dates, and communication between parents/guardians. The application enables co-parents to coordinate schedules, manage child activities, handle custody arrangements, submit change requests, and receive notifications.
 
-## Estructura del Proyecto
+The project is a full-stack application with a REST API backend and Progressive Web App (PWA) frontend. The backend is fully operational with authentication, business logic, and database connectivity. The frontend is configured and ready for active development.
 
-```
-ProyectoFinal/
-├── backend/              # Backend Spring Boot (en configuración)
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/derwe/parent/
-│   │   │   │   ├── controller/
-│   │   │   │   ├── service/
-│   │   │   │   ├── repository/
-│   │   │   │   ├── model/
-│   │   │   │   ├── dto/
-│   │   │   │   ├── config/
-│   │   │   │   ├── exception/
-│   │   │   │   └── DerWeParentApplication.java
-│   │   │   └── resources/
-│   │   │       └── application.properties
-│   │   └── test/
-│   └── pom.xml
-├── frontend/             # Frontend PWA React + Vite (configurado)
-│   ├── src/
-│   │   ├── components/
-│   │   ├── services/
-│   │   ├── context/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   ├── App.css
-│   │   └── index.css
-│   ├── public/
-│   ├── index.html
-│   ├── vite.config.js
-│   └── package.json
-├── database/
-│   └── migrations/
-└── docs/
-```
+## User Preferences
 
-## Configuración Actual
+Preferred communication style: Simple, everyday language.
 
-### Backend
-- **Framework**: Spring Boot 3.2.0
-- **Java**: 17
-- **Base de Datos**: PostgreSQL (persistente)
-- **Puerto**: 8080
-- **Seguridad**: Spring Security + JWT (en pom.xml)
+## System Architecture
 
-**Modelo de Dominio (13 archivos):**
-- 5 Enums: EstadoInvitacion, EstadoCustodia, TipoNotificacion, EstadoActividad, EstadoSolicitud
-- 8 Entidades JPA: Padre, Hijo, RelacionPadreHijo, Invitacion, Actividad, FechaCustodia, SolicitudCambio, Notificacion
+### Frontend Architecture
 
-**Capa de Persistencia (8 archivos):**
-- PadreRepository - Gestión de padres/tutores con búsqueda por email
-- HijoRepository - Gestión de hijos con búsqueda por padre (JPQL)
-- RelacionPadreHijoRepository - Relaciones padre-hijo con colores UI (LILA/CELESTE)
-- InvitacionRepository - Invitaciones con token único y estados
-- ActividadRepository - Actividades con filtros por fecha/rango/estado
-- FechaCustodiaRepository - Calendario de custodia por hijo/padre/fecha
-- SolicitudCambioRepository - Solicitudes de cambio con filtros
-- NotificacionRepository - Notificaciones con contador de no leídas
+**Technology Stack:**
+- React 18.2 with Vite as the build tool
+- Progressive Web App (PWA) with service worker and manifest
+- React Router for client-side routing
+- Axios for HTTP requests
+- Development server runs on port 5000
 
-### Frontend (PWA)
-- **Framework**: React 18.2.0 + Vite 5.0.8
-- **Tipo**: Progressive Web App (PWA)
-- **Puerto**: 5000 (0.0.0.0)
-- **Navegación**: React Router DOM 6.20
-- **HTTP**: Axios 1.6.2
-- **PWA**: vite-plugin-pwa con Workbox
+**Design Decisions:**
+- **PWA Implementation**: Chosen to provide offline capabilities and app-like experience on mobile devices without requiring app store distribution. The service worker caches API responses using a NetworkFirst strategy with 5-minute expiration.
+- **Vite Build System**: Selected over Create React App for faster development builds and better performance. Provides hot module replacement and optimized production builds.
+- **Component Architecture**: Standard React component structure expected, following modern functional component patterns with hooks.
 
-**Archivos creados:**
-- `package.json` - Dependencias npm y scripts
-- `vite.config.js` - Configuración de Vite, PWA y proxy al backend
-- `index.html` - Punto de entrada HTML
-- `src/main.jsx` - Entry point React
-- `src/App.jsx` - Componente principal con enrutamiento
-- `src/App.css` - Estilos principales
-- `src/index.css` - Estilos globales
+**Configuration:**
+- Custom theme colors (primary: #FF6B35, secondary: #764ba2)
+- Gradient-based UI design system
+- Responsive design targeting mobile-first approach
+- Service worker configured for API caching with NetworkFirst strategy
 
-## Tecnologías Configuradas
+### Backend Architecture
 
-### Backend
-- Spring Boot Starter Web
-- Spring Boot Starter Data JPA
-- Spring Boot Starter Security
-- JWT (jjwt 0.11.5)
-- PostgreSQL Driver
-- Lombok
-- Validation
+**Technology Stack:**
+- Java 17 with Spring Boot 3.2
+- Spring Security with JWT authentication
+- JPA/Hibernate for ORM
+- PostgreSQL database (H2 for development)
+- Backend runs on port 8080
 
-### Frontend (PWA)
-- React 18.2.0
-- React DOM 18.2.0
-- React Router DOM 6.20
-- Vite 5.0.8
-- @vitejs/plugin-react 4.2.1
-- vite-plugin-pwa 0.17.4
-- Axios 1.6.2
-- Service Worker (generado automáticamente)
-- Web App Manifest (configurado)
+**Architectural Layers:**
 
-## Componentes Completados
+1. **Controller Layer** (8 REST Controllers):
+   - AuthController - Authentication and authorization
+   - InvitacionController - Co-parent invitation management
+   - HijoController - Child profile management
+   - ActividadController - Activity scheduling and tracking
+   - FechaCustodiaController - Custody date management
+   - SolicitudCambioController - Change request workflow
+   - NotificacionController - Notification delivery
+   - CalendarioController - Calendar aggregation and views
 
-✅ **Modelos de Dominio**: 8 entidades JPA + 5 enums
-✅ **Repositorios**: 8 interfaces JPA Repository con queries personalizadas
-✅ **Base de Datos**: PostgreSQL persistente con 8 tablas y relaciones
-✅ **Frontend PWA**: React + Vite configurado con service worker
-✅ **Autenticación JWT**: Sistema completo production-ready
-✅ **Manejo de Excepciones**: GlobalExceptionHandler con códigos HTTP apropiados
-✅ **Servicios**: PadreService y AuthService implementados
-✅ **Controladores**: AuthController con endpoints /register, /login y /validate
+2. **Service Layer** (9 Business Services):
+   - Contains business logic and orchestration between repositories
+   - Handles validation, authorization checks, and complex operations
+   - Services mirror controllers plus PadreService for parent management
 
-### Sistema de Autenticación (COMPLETADO - 08/11/2025)
+3. **Repository Layer** (8 JPA Repositories):
+   - Custom query methods for complex data retrieval
+   - Leverages Spring Data JPA for CRUD operations
 
-**Servicios (2 archivos):**
-- `PadreService` - Registro de padres con validación de email duplicado
-- `AuthService` - Login, validación de tokens, generación JWT
+4. **Data Transfer Objects**:
+   - 7 Request DTOs for incoming data validation
+   - 10 Response DTOs for consistent API responses
+   - Separation ensures security (no entity exposure) and API versioning flexibility
 
-**DTOs (7 archivos):**
-- Request: PadreRequestDTO, LoginRequestDTO, InvitacionRequestDTO, HijoRequestDTO, ActividadRequestDTO, SolicitudCambioRequestDTO, FechaCustodiaRequestDTO
-- Response: PadreResponseDTO (sin password), LoginResponseDTO (token + datos)
+5. **Domain Model**:
+   - 8 Entities representing core business objects
+   - 5 Enums for type safety and state management
+   - JPA relationships configured for parent-child associations
 
-**Excepciones Personalizadas (4 archivos):**
-- `DuplicateEmailException` → HTTP 409 CONFLICT
-- `InvalidCredentialsException` → HTTP 401 UNAUTHORIZED
-- `AccountDeactivatedException` → HTTP 403 FORBIDDEN
-- `ResourceNotFoundException` → HTTP 404 NOT FOUND
+**Security Architecture:**
+- JWT-based stateless authentication
+- Token-based authorization for API endpoints
+- Spring Security filter chain for request validation
+- Role-based access control for parental coordination features
 
-**GlobalExceptionHandler:**
-- Maneja excepciones personalizadas con códigos HTTP apropiados
-- Validación de campos → HTTP 400 BAD REQUEST
-- Errores genéricos → HTTP 500 (sin exponer detalles internos)
+**Design Rationale:**
+- **Layered Architecture**: Clear separation of concerns improves maintainability and testability. Each layer has single responsibility.
+- **JWT Authentication**: Stateless authentication chosen to support mobile/PWA clients and enable horizontal scaling without session management overhead.
+- **DTO Pattern**: Prevents over-fetching, protects internal entity structure, and allows API evolution without database schema changes.
+- **JPA/Hibernate**: Provides database abstraction, reducing vendor lock-in and simplifying complex query generation.
 
-**Seguridad:**
-- `JwtUtil` - Generación y validación de tokens con secret key y expiración de 24h
-- `SecurityConfig` - CORS habilitado, endpoints públicos (/register, /login), filtro JWT
-- `JwtAuthenticationFilter` - Validación automática de tokens en requests
-- `CustomUserDetailsService` - Carga usuarios desde PadreRepository
+### Data Storage
 
-**Endpoints REST API:**
-- `POST /api/auth/register` - Registro de nuevos padres/tutores (HTTP 201)
-- `POST /api/auth/login` - Login con email/password (HTTP 200)
-- `GET /api/auth/validate` - Validación de token JWT (HTTP 200/401)
+**Database:**
+- PostgreSQL for production environment
+- H2 in-memory database for development/testing
 
-**Pruebas Manuales Exitosas:**
-✅ Registro de usuario nuevo → HTTP 201 + JWT token
-✅ Login con credenciales válidas → HTTP 200 + JWT token
-✅ Validación de token válido → HTTP 200 (true)
-✅ Email duplicado → HTTP 409 CONFLICT
-✅ Credenciales inválidas → HTTP 401 UNAUTHORIZED
-✅ Header Authorization faltante → HTTP 401 UNAUTHORIZED
+**Schema Design:**
+- Entities: Padre (Parent), Hijo (Child), Actividad (Activity), FechaCustodia (Custody Date), SolicitudCambio (Change Request), Notificacion (Notification), Invitacion (Invitation), Calendario (Calendar)
+- Relationships support multi-parent scenarios and shared custody arrangements
+- Enums enforce data integrity for states and types
 
-### Capa de Servicios (COMPLETADO - 08/11/2025)
+**Design Decisions:**
+- **PostgreSQL Selection**: Chosen for production due to robust JSON support (for flexible notification payloads), strong ACID compliance (critical for custody coordination), and proven scalability.
+- **H2 Development Database**: Enables rapid local development without external database dependencies and simplifies testing.
 
-**Servicios Business Logic (7 archivos):**
-- `InvitacionService` - Enviar/aceptar invitaciones a co-padres
-- `HijoService` - Gestión de hijos con asignación de colores (LILA/CELESTE)
-- `ActividadService` - CRUD actividades + sistema de aprobación
-- `FechaCustodiaService` - Establecer/consultar fechas de custodia
-- `SolicitudCambioService` - Solicitudes de cambio con aprobación/rechazo
-- `NotificacionService` - Sistema de notificaciones en tiempo real
-- `PadreService + AuthService` - Autenticación y gestión de padres
+### Authentication & Authorization
 
-### Capa de Controladores REST (COMPLETADO - 08/11/2025)
+**Mechanism:**
+- JWT (JSON Web Tokens) for stateless authentication
+- Token-based access control for all protected endpoints
+- Spring Security integration with custom filters
 
-**Controladores REST API (7 archivos):**
-- `AuthController` - POST /api/auth/register, /login, /validate
-- `InvitacionController` - /api/invitaciones (enviar, aceptar, listar)
-- `HijoController` - /api/hijos (crear, vincular, listar)
-- `ActividadController` - /api/actividades (CRUD, por fecha/mes)
-- `FechaCustodiaController` - /api/custodias (establecer, por hijo/mes)
-- `SolicitudCambioController` - /api/solicitudes-cambio (crear, aprobar, rechazar)
-- `NotificacionController` - /api/notificaciones (listar, marcar leídas, contador)
+**Flow:**
+1. User authenticates via AuthController
+2. JWT token issued with user claims
+3. Client includes token in Authorization header
+4. Spring Security validates token on each request
+5. User context established for authorization checks
 
-**Características implementadas:**
-- ✅ Autenticación JWT en todos los endpoints protegidos
-- ✅ Validación automática de permisos por padre
-- ✅ Sistema de notificaciones automáticas entre co-padres
-- ✅ Gestión de colores UI (LILA/CELESTE) por relación padre-hijo
-- ✅ Sistema de aprobación para actividades modificadas por co-padre
-- ✅ Solicitudes de cambio de custodia con aprobación/rechazo
+**Rationale:**
+- Stateless design supports PWA offline scenarios
+- Tokens can be stored in browser local storage
+- No server-side session management required
+- Enables microservices architecture in future
 
-## Próximos Pasos de Desarrollo
+### API Design
 
-1. **Frontend React**: Desarrollar componentes y pantallas de usuario
-2. **Integración**: Conectar frontend PWA con backend REST API
-3. **Testing**: Pruebas de integración y end-to-end
-4. **Deploy**: Preparar para producción
+**RESTful Conventions:**
+- Standard HTTP methods (GET, POST, PUT, DELETE)
+- Resource-based URL structure
+- JSON request/response format
+- Consistent error response structure
 
-## Ejecución
+**Endpoint Organization:**
+- `/api/auth/*` - Authentication operations
+- `/api/invitaciones/*` - Invitation management
+- `/api/hijos/*` - Child profiles
+- `/api/actividades/*` - Activity CRUD
+- `/api/fechas-custodia/*` - Custody scheduling
+- `/api/solicitudes-cambio/*` - Change requests
+- `/api/notificaciones/*` - Notifications
+- `/api/calendario/*` - Calendar views
 
-### Backend (Puerto 8080)
-```bash
-cd backend
-mvn spring-boot:run
-```
-Estado: ✅ FUNCIONANDO con PostgreSQL
+## External Dependencies
 
-### Frontend (Puerto 5000)
-```bash
-cd frontend
-npm run dev
-```
-Estado: ✅ PWA configurada con hot reload
+### Third-Party Libraries
 
-**Base de Datos:**
-- PostgreSQL persistente activa
-- 8 tablas con relaciones creadas
-- Datos no se pierden al reiniciar
+**Backend:**
+- Spring Boot 3.2 - Application framework
+- Spring Security - Authentication and authorization
+- Spring Data JPA - Data access layer
+- Hibernate - ORM implementation
+- PostgreSQL JDBC Driver - Database connectivity
+- JWT libraries (implied) - Token generation/validation
 
-## Funcionalidades Planificadas
-- Registro e invitación de co-padres
-- Gestión de hijos
-- Calendario de custodia
-- Gestión de actividades
-- Solicitudes de cambio
-- Sistema de notificaciones
+**Frontend:**
+- React 18.2 - UI framework
+- React Router DOM 6.20 - Client-side routing
+- Axios 1.6.2 - HTTP client
+- Vite 5.0.8 - Build tool and dev server
+- Vite Plugin PWA 0.17.4 - Progressive Web App capabilities
 
-## Autor
-**Romina Gianoboli**  
-Trabajo Final de Grado - Ingeniería en Software  
-Universidad Siglo 21 - 2025
+### External Services
+
+**Database:**
+- PostgreSQL - Primary production database
+- Connection details configured in Spring application properties
+
+**Development Tools:**
+- Maven - Backend dependency management and build
+- npm - Frontend dependency management
+- Vite dev server - Hot reload during development
+
+### API Integration Points
+
+**Backend to Frontend:**
+- REST API exposed on port 8080
+- CORS configuration required for port 5000 access
+- JWT tokens passed via Authorization headers
+
+**PWA Service Worker:**
+- Caches API responses with NetworkFirst strategy
+- 5-minute cache expiration for API calls
+- Offline capability for previously accessed data
+
+### Build and Deployment
+
+**Backend:**
+- Maven-based build process
+- Compiled to JAR file
+- Runs as standalone Spring Boot application
+
+**Frontend:**
+- Vite build generates optimized static assets
+- PWA manifest and service worker generated automatically
+- Static files can be served from any web server or CDN
