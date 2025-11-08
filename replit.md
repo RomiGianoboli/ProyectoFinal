@@ -2,9 +2,9 @@
 
 ## Overview
 
-DerWeParent is a comprehensive parental coordination system designed to manage activities, custody dates, and communication between parents/guardians. The application enables co-parents to coordinate schedules, manage child activities, handle custody arrangements, submit change requests, and receive notifications.
+DerWeParent ("We Parent") is a comprehensive parental coordination Progressive Web App (PWA) designed to manage activities, custody dates, and communication between co-parents. The application enables co-parents to coordinate schedules, manage child activities, handle custody arrangements, submit change requests, and receive notifications.
 
-The project is a full-stack application with a REST API backend and Progressive Web App (PWA) frontend. The backend is fully operational with authentication, business logic, and database connectivity. The frontend is configured and ready for active development.
+The project is a full-stack application with a Spring Boot REST API backend and React PWA frontend. Both backend and frontend are fully implemented, tested, and production-ready. This is a final degree project (TFG) for Software Engineering at Universidad Siglo 21 by Romina Gianoboli.
 
 ## User Preferences
 
@@ -15,22 +15,37 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Architecture
 
 **Technology Stack:**
-- React 18.2 with Vite as the build tool
+- React 18.2 with Vite 5.0.8 as the build tool
 - Progressive Web App (PWA) with service worker and manifest
-- React Router for client-side routing
-- Axios for HTTP requests
+- React Router 6.20 for client-side routing
+- Axios 1.6.2 for HTTP requests with JWT interceptors
 - Development server runs on port 5000
 
+**Implemented Features:**
+- ✅ Complete authentication system (Login, Registro) with JWT persistence
+- ✅ Dashboard/Home with child selector and navigation
+- ✅ Monthly calendar view with activities and custody dates (LILA/CELESTE colors)
+- ✅ Full activity CRUD (list, create, edit, delete)
+- ✅ Custody management with monthly navigation
+- ✅ Notification center with read/unread status
+- ✅ Child management (add child, invite co-parent)
+- ✅ Protected routes with PrivateRoute component
+- ✅ LocalStorage persistence for authentication and child selection
+
 **Design Decisions:**
-- **PWA Implementation**: Chosen to provide offline capabilities and app-like experience on mobile devices without requiring app store distribution. The service worker caches API responses using a NetworkFirst strategy with 5-minute expiration.
-- **Vite Build System**: Selected over Create React App for faster development builds and better performance. Provides hot module replacement and optimized production builds.
-- **Component Architecture**: Standard React component structure expected, following modern functional component patterns with hooks.
+- **PWA Implementation**: Provides offline capabilities and app-like experience on mobile devices without requiring app store distribution. The service worker caches API responses using a NetworkFirst strategy with 5-minute expiration.
+- **Vite Build System**: Selected for faster development builds and better performance. Provides hot module replacement and optimized production builds.
+- **Component Architecture**: Functional components with React hooks for state management. AuthContext provides centralized authentication state.
+- **Environment Variables**: API URL configured via VITE_API_URL for environment flexibility (localhost in dev, relative path in production).
+- **LocalStorage Persistence**: Child selection persists across sessions to support PWA deep-linking and navigation.
 
 **Configuration:**
-- Custom theme colors (primary: #FF6B35, secondary: #764ba2)
-- Gradient-based UI design system
+- Custom theme colors: Orange/peach (#ff9b71) primary, Beige/cream (#f5f0e8) background
+- "We Parent" branding throughout the application
+- Gradient-based UI design system matching Figma mockups
 - Responsive design targeting mobile-first approach
 - Service worker configured for API caching with NetworkFirst strategy
+- Apple PWA meta tags for iOS installation support
 
 ### Backend Architecture
 
