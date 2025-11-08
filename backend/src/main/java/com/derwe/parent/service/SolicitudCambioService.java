@@ -96,7 +96,7 @@ public class SolicitudCambioService {
         // Notificar al solicitante
         notificacionService.crearNotificacion(
             solicitud.getPadreSolicitante().getId(),
-            TipoNotificacion.SOLICITUD_APROBADA,
+            TipoNotificacion.CAMBIO_CUSTODIA_APROBADO,
             solicitudId,
             "Tu solicitud de cambio de custodia fue aprobada"
         );
@@ -128,7 +128,7 @@ public class SolicitudCambioService {
         // Notificar al solicitante
         notificacionService.crearNotificacion(
             solicitud.getPadreSolicitante().getId(),
-            TipoNotificacion.SOLICITUD_RECHAZADA,
+            TipoNotificacion.CAMBIO_CUSTODIA_RECHAZADO,
             solicitudId,
             "Tu solicitud de cambio de custodia fue rechazada"
         );
@@ -152,7 +152,7 @@ public class SolicitudCambioService {
     
     @Transactional(readOnly = true)
     public List<SolicitudCambioResponseDTO> obtenerSolicitudesPorEstado(Long padreId, EstadoSolicitud estado) {
-        return solicitudCambioRepository.findByPadreSolicitanteIdAndEstado(padreId, estado).stream()
+        return solicitudCambioRepository.findByPadreReceptorIdAndEstado(padreId, estado).stream()
             .map(this::convertirAResponseDTO)
             .collect(Collectors.toList());
     }
