@@ -70,9 +70,10 @@ export const notificacionAPI = {
 };
 
 export const invitacionAPI = {
-  enviar: (data) => api.post('/invitaciones/enviar', data),
-  aceptar: (token) => api.post(`/invitaciones/aceptar/${token}`),
-  pendientes: () => api.get('/invitaciones/pendientes'),
+  enviar: (data) => api.post('/invitaciones', data),
+  aceptar: (token) => api.post(`/invitaciones/${token}/aceptar`),
+  enviadas: () => api.get('/invitaciones/enviadas'),
+  recibidas: () => api.get('/invitaciones/recibidas'),
 };
 
 export const solicitudAPI = {
