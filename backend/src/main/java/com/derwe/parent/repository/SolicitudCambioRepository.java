@@ -20,9 +20,9 @@ public interface SolicitudCambioRepository extends JpaRepository<SolicitudCambio
     
     List<SolicitudCambio> findByEstado(EstadoSolicitud estado);
     
-    @Query("SELECT s FROM SolicitudCambio s WHERE s.padreReceptor.id = :padreReceptorId AND s.estado = :estado")
+    @Query("SELECT s FROM SolicitudCambio s WHERE s.padreReceptor.id = :padreId AND s.estado = :estado")
     List<SolicitudCambio> findByPadreReceptorIdAndEstado(
-        @Param("padreReceptorId") Long padreReceptorId,
+        @Param("padreId") Long padreId,
         @Param("estado") EstadoSolicitud estado
     );
     

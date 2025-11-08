@@ -4,7 +4,7 @@
 Sistema integral de coordinación parental para gestionar actividades, fechas de custodia y comunicación entre padres/tutores.
 
 ## Estado Actual del Proyecto
-El proyecto se encuentra en fase de configuración inicial con la estructura base creada para desarrollo fullstack.
+El proyecto cuenta con la capa de modelo y persistencia completamente implementada. Backend Spring Boot funcionando con PostgreSQL y frontend PWA configurado.
 
 ## Estructura del Proyecto
 
@@ -49,14 +49,23 @@ ProyectoFinal/
 ### Backend
 - **Framework**: Spring Boot 3.2.0
 - **Java**: 17
-- **Base de Datos**: H2 (desarrollo configurado)
+- **Base de Datos**: PostgreSQL (persistente)
 - **Puerto**: 8080
-- **Seguridad**: Spring Security + JWT (configurado en pom.xml)
+- **Seguridad**: Spring Security + JWT (en pom.xml)
 
-**Archivos creados:**
-- `pom.xml` - Dependencias Maven configuradas
-- `application.properties` - Configuración de BD y JWT
-- `DerWeParentApplication.java` - Clase principal Spring Boot
+**Modelo de Dominio (13 archivos):**
+- 5 Enums: EstadoInvitacion, EstadoCustodia, TipoNotificacion, EstadoActividad, EstadoSolicitud
+- 8 Entidades JPA: Padre, Hijo, RelacionPadreHijo, Invitacion, Actividad, FechaCustodia, SolicitudCambio, Notificacion
+
+**Capa de Persistencia (8 archivos):**
+- PadreRepository - Gestión de padres/tutores con búsqueda por email
+- HijoRepository - Gestión de hijos con búsqueda por padre (JPQL)
+- RelacionPadreHijoRepository - Relaciones padre-hijo con colores UI (LILA/CELESTE)
+- InvitacionRepository - Invitaciones con token único y estados
+- ActividadRepository - Actividades con filtros por fecha/rango/estado
+- FechaCustodiaRepository - Calendario de custodia por hijo/padre/fecha
+- SolicitudCambioRepository - Solicitudes de cambio con filtros
+- NotificacionRepository - Notificaciones con contador de no leídas
 
 ### Frontend (PWA)
 - **Framework**: React 18.2.0 + Vite 5.0.8
@@ -82,7 +91,7 @@ ProyectoFinal/
 - Spring Boot Starter Data JPA
 - Spring Boot Starter Security
 - JWT (jjwt 0.11.5)
-- H2 Database
+- PostgreSQL Driver
 - Lombok
 - Validation
 
@@ -97,32 +106,41 @@ ProyectoFinal/
 - Service Worker (generado automáticamente)
 - Web App Manifest (configurado)
 
+## Componentes Completados
+
+✅ **Modelos de Dominio**: 8 entidades JPA + 5 enums
+✅ **Repositorios**: 8 interfaces JPA Repository con queries personalizadas
+✅ **Base de Datos**: PostgreSQL persistente con 8 tablas y relaciones
+✅ **Frontend PWA**: React + Vite configurado con service worker
+
 ## Próximos Pasos de Desarrollo
 
-1. **Modelos de Dominio**: Crear entidades JPA (Usuario, Hijo, Actividad, Custodia)
-2. **Repositorios**: Implementar interfaces JPA Repository
-3. **Servicios**: Desarrollar lógica de negocio
-4. **Controladores**: Crear endpoints REST API
-5. **Seguridad**: Implementar autenticación JWT
-6. **Frontend**: Desarrollar pantallas y componentes
-7. **Integración**: Conectar frontend con backend
+1. **Servicios**: Desarrollar lógica de negocio
+2. **Seguridad**: Implementar autenticación JWT completa
+3. **Controladores**: Crear endpoints REST API
+4. **Frontend**: Desarrollar componentes y pantallas
+5. **Integración**: Conectar frontend con backend
 
-## Ejecución (cuando esté implementado)
+## Ejecución
 
-### Backend
+### Backend (Puerto 8080)
 ```bash
 cd backend
 mvn spring-boot:run
 ```
+Estado: ✅ FUNCIONANDO con PostgreSQL
 
-### Frontend
+### Frontend (Puerto 5000)
 ```bash
 cd frontend
-npm install
 npm run dev
 ```
+Estado: ✅ PWA configurada con hot reload
 
-La aplicación PWA se ejecutará en http://localhost:5000 con hot reload.
+**Base de Datos:**
+- PostgreSQL persistente activa
+- 8 tablas con relaciones creadas
+- Datos no se pierden al reiniciar
 
 ## Funcionalidades Planificadas
 - Registro e invitación de co-padres
