@@ -41,8 +41,8 @@ export const authAPI = {
 };
 
 export const hijoAPI = {
-  crear: (data) => api.post('/hijos/crear', data),
-  misHijos: () => api.get('/hijos/mis-hijos'),
+  crear: (data) => api.post('/hijos', data),
+  misHijos: () => api.get('/hijos'),
   vincular: (data) => api.post('/hijos/vincular', data),
 };
 
