@@ -1,39 +1,69 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { invitacionAPI } from '../services/api';
+import { invitacionAPI, hijoAPI } from '../services/api';
 import './Login.css';
 
 const Invitacion = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
-  const [email, setEmail] = useState('');
+  const [formData, setFormData] = useState({
+    nombreCoPadre: '',
+    apellidoCoPadre: '',
+    emailCoPadre: '',
+    hijos: [{ nombre: '', apellido: '' }]
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleHijoChange = (index, field, value) => {
+    const nuevosHijos = [...formData.hijos];
+    nuevosHijos[index][field] = value;
+    setFormData({ ...formData, hijos: nuevosHijos });
+  };
+
+  const agregarOtroHijo = () => {
+    setFormData({
+      ...formData,
+      hijos: [...formData.hijos, { nombre: '', apellido: '' }]
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess(false);
     setLoading(true);
 
     try {
-      await invitacionAPI.enviar({ emailInvitado: email });
-      setSuccess(true);
-      setEmail('');
-      setTimeout(() => {
-        navigate('/agregar-hijo');
-      }, 2000);
+      // Crear los hijos primero
+      for (const hijo of formData.hijos) {
+        if (hijo.nombre && hijo.apellido) {
+          await hijoAPI.crear({
+            nombre: hijo.nombre,
+            apellido: hijo.apellido,
+            fechaNacimiento: new Date().toISOString().split('T')[0] // Fecha temporal
+          });
+        }
+      }
+
+      // Si hay email de co-padre, enviar invitación
+      if (formData.emailCoPadre) {
+        await invitacionAPI.enviar({ emailInvitado: formData.emailCoPadre });
+      }
+
+      navigate('/home');
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al enviar invitación');
+      setError(err.response?.data?.message || 'Error al procesar la información');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSkip = () => {
-    navigate('/agregar-hijo');
   };
 
   const handleLogout = () => {
@@ -51,28 +81,67 @@ const Invitacion = () => {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label>Email</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@delcopadre.com"
+              type="text"
+              name="nombreCoPadre"
+              value={formData.nombreCoPadre}
+              onChange={handleChange}
+              placeholder="Nombre"
             />
           </div>
 
-          {error && <div className="error-message">{error}</div>}
-          {success && (
-            <div className="success-message">
-              ¡Invitación enviada!
+          <div className="form-group">
+            <input
+              type="text"
+              name="apellidoCoPadre"
+              value={formData.apellidoCoPadre}
+              onChange={handleChange}
+              placeholder="Apellido"
+            />
+          </div>
+
+          <div className="form-group">
+            <input
+              type="email"
+              name="emailCoPadre"
+              value={formData.emailCoPadre}
+              onChange={handleChange}
+              placeholder="Email"
+            />
+          </div>
+
+          <div className="form-section-title">Agrega a tu hijo/a</div>
+
+          {formData.hijos.map((hijo, index) => (
+            <div key={index}>
+              <div className="form-group">
+                <input
+                  type="text"
+                  value={hijo.nombre}
+                  onChange={(e) => handleHijoChange(index, 'nombre', e.target.value)}
+                  placeholder="Nombre"
+                />
+              </div>
+
+              <div className="form-group">
+                <input
+                  type="text"
+                  value={hijo.apellido}
+                  onChange={(e) => handleHijoChange(index, 'apellido', e.target.value)}
+                  placeholder="Apellido"
+                />
+              </div>
             </div>
-          )}
+          ))}
+
+          <div className="add-another-link" onClick={agregarOtroHijo}>
+            + Agregar otro hijo
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
 
           <button type="submit" className="btn-primary" disabled={loading}>
-            {loading ? 'Enviando...' : 'Enviar invitación'}
-          </button>
-
-          <button type="button" className="btn-secondary" onClick={handleSkip}>
-            Omitir por ahora
+            {loading ? 'Procesando...' : 'Continuar'}
           </button>
 
           <button type="button" className="btn-secondary" onClick={handleLogout}>
