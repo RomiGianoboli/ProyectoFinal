@@ -41,7 +41,7 @@ const Registro = () => {
 
     try {
       await register(formData.nombre, formData.apellido, formData.email, formData.password);
-      navigate('/detalles-hijos');
+      navigate('/agregar-hijo');
     } catch (err) {
       console.error('Error de registro:', err);
       
