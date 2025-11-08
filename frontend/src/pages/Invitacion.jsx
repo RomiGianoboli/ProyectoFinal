@@ -47,8 +47,7 @@ const Invitacion = () => {
         if (hijo.nombre && hijo.apellido) {
           await hijoAPI.crear({
             nombre: hijo.nombre,
-            apellido: hijo.apellido,
-            fechaNacimiento: new Date().toISOString().split('T')[0] // Fecha temporal
+            apellido: hijo.apellido
           });
         }
       }

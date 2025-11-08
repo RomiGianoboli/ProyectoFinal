@@ -23,7 +23,6 @@ public class HijoRequestDTO {
     @Size(min = 2, max = 50, message = "El apellido debe tener entre 2 y 50 caracteres")
     private String apellido;
     
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
     private LocalDate fechaNacimiento;
 }

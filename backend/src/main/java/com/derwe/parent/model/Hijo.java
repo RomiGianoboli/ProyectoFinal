@@ -36,9 +36,8 @@ public class Hijo {
     @Column(nullable = false, length = 50)
     private String apellido;
     
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
     @Past(message = "La fecha de nacimiento debe ser en el pasado")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDate fechaNacimiento;
     
     @CreationTimestamp
