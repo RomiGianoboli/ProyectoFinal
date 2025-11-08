@@ -1,50 +1,112 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Login from './pages/Login';
+import Registro from './pages/Registro';
+import Home from './pages/Home';
+import Calendario from './pages/Calendario';
+import AgregarHijo from './pages/AgregarHijo';
+import Invitacion from './pages/Invitacion';
+import Actividades from './pages/Actividades';
+import AgregarActividad from './pages/AgregarActividad';
+import EditarActividad from './pages/EditarActividad';
+import Notificaciones from './pages/Notificaciones';
+import Custodias from './pages/Custodias';
 import './App.css';
 
-function Home() {
-  return (
-    <div className="home-container">
-      <div className="hero">
-        <h1>DerWeParent</h1>
-        <p className="subtitle">Sistema de Coordinación Parental</p>
-        <p className="description">
-          Gestiona actividades, fechas de custodia y comunicación entre padres/tutores de manera simple y efectiva.
-        </p>
-        <div className="status-badge">
-          <span className="status-icon">✓</span>
-          Sistema Activo
-        </div>
-      </div>
-      
-      <div className="features">
-        <div className="feature-card">
-          <div className="feature-icon">👥</div>
-          <h3>Gestión de Co-padres</h3>
-          <p>Invita y coordina con otros tutores</p>
-        </div>
-        <div className="feature-card">
-          <div className="feature-icon">📅</div>
-          <h3>Calendario de Custodia</h3>
-          <p>Organiza fechas y solicita cambios</p>
-        </div>
-        <div className="feature-card">
-          <div className="feature-icon">🎯</div>
-          <h3>Actividades</h3>
-          <p>Registra y gestiona actividades de tus hijos</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return <div className="loading-screen">Cargando...</div>;
+  }
+  
+  return user ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route 
+            path="/home" 
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/calendario" 
+            element={
+              <PrivateRoute>
+                <Calendario />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/actividades" 
+            element={
+              <PrivateRoute>
+                <Actividades />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/agregar-hijo" 
+            element={
+              <PrivateRoute>
+                <AgregarHijo />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/invitacion" 
+            element={
+              <PrivateRoute>
+                <Invitacion />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/agregar-actividad" 
+            element={
+              <PrivateRoute>
+                <AgregarActividad />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/editar-actividad" 
+            element={
+              <PrivateRoute>
+                <EditarActividad />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/notificaciones" 
+            element={
+              <PrivateRoute>
+                <Notificaciones />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/custodias" 
+            element={
+              <PrivateRoute>
+                <Custodias />
+              </PrivateRoute>
+            } 
+          />
+          <Route path="/" element={<Navigate to="/login" />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

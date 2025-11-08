@@ -1,0 +1,218 @@
+.actividades-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f0e8 0%, #fdf8f3 100%);
+  padding-bottom: 80px;
+}
+
+.actividades-header {
+  background: white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.actividades-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0;
+}
+
+.actividades-content {
+  padding: 0 20px;
+}
+
+.hijo-info {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.hijo-info h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0;
+}
+
+.fecha-selector {
+  margin-bottom: 24px;
+}
+
+.fecha-selector label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d2d2d;
+  margin-bottom: 8px;
+}
+
+.fecha-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 15px;
+  background: white;
+  cursor: pointer;
+}
+
+.actividades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.actividad-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.actividad-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.actividad-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0;
+  flex: 1;
+}
+
+.estado-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.estado-confirmada {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-cancelada {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.actividad-descripcion {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+.actividad-detalles {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+.detalle-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.detalle-label {
+  font-size: 16px;
+}
+
+.actividad-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-editar,
+.btn-eliminar {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-editar {
+  background: #f0f0f0;
+  color: #2d2d2d;
+}
+
+.btn-editar:hover {
+  background: #e0e0e0;
+}
+
+.btn-eliminar {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.btn-eliminar:hover {
+  background: #fecaca;
+}
+
+.btn-agregar-floating {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: linear-gradient(135deg, #ff9b71 0%, #ff8a5c 100%);
+  color: white;
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(255, 155, 113, 0.4);
+  transition: all 0.3s;
+}
+
+.btn-agregar-floating:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 24px rgba(255, 155, 113, 0.5);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+@media (max-width: 480px) {
+  .btn-agregar-floating {
+    width: 56px;
+    height: 56px;
+    font-size: 20px;
+  }
+}

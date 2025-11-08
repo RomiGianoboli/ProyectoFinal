@@ -1,0 +1,126 @@
+.form-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f0e8 0%, #fdf8f3 100%);
+  padding-bottom: 40px;
+}
+
+.form-header {
+  background: white;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.form-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0;
+}
+
+.form-content {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.logo-small-center {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo-small-center h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+}
+
+.form-subtitle {
+  color: #666;
+  font-size: 15px;
+  margin: 0;
+}
+
+.form {
+  background: white;
+  border-radius: 16px;
+  padding: 32px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form .form-group {
+  margin-bottom: 20px;
+}
+
+.form .form-group:last-of-type {
+  margin-bottom: 24px;
+}
+
+.form .form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d2d2d;
+  margin-bottom: 8px;
+}
+
+.form .form-group input,
+.form .form-group select,
+.form .form-group textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.2s;
+  background: #fafafa;
+  font-family: inherit;
+}
+
+.form .form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form .form-group input:focus,
+.form .form-group select:focus,
+.form .form-group textarea:focus {
+  outline: none;
+  border-color: #ff9b71;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(255, 155, 113, 0.1);
+}
+
+.form .btn-primary {
+  width: 100%;
+}
+
+.form-hint {
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+.success-message {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #15803d;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 480px) {
+  .form {
+    padding: 24px 20px;
+  }
+}
