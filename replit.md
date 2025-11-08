@@ -157,12 +157,42 @@ ProyectoFinal/
 ✅ Credenciales inválidas → HTTP 401 UNAUTHORIZED
 ✅ Header Authorization faltante → HTTP 401 UNAUTHORIZED
 
+### Capa de Servicios (COMPLETADO - 08/11/2025)
+
+**Servicios Business Logic (7 archivos):**
+- `InvitacionService` - Enviar/aceptar invitaciones a co-padres
+- `HijoService` - Gestión de hijos con asignación de colores (LILA/CELESTE)
+- `ActividadService` - CRUD actividades + sistema de aprobación
+- `FechaCustodiaService` - Establecer/consultar fechas de custodia
+- `SolicitudCambioService` - Solicitudes de cambio con aprobación/rechazo
+- `NotificacionService` - Sistema de notificaciones en tiempo real
+- `PadreService + AuthService` - Autenticación y gestión de padres
+
+### Capa de Controladores REST (COMPLETADO - 08/11/2025)
+
+**Controladores REST API (7 archivos):**
+- `AuthController` - POST /api/auth/register, /login, /validate
+- `InvitacionController` - /api/invitaciones (enviar, aceptar, listar)
+- `HijoController` - /api/hijos (crear, vincular, listar)
+- `ActividadController` - /api/actividades (CRUD, por fecha/mes)
+- `FechaCustodiaController` - /api/custodias (establecer, por hijo/mes)
+- `SolicitudCambioController` - /api/solicitudes-cambio (crear, aprobar, rechazar)
+- `NotificacionController` - /api/notificaciones (listar, marcar leídas, contador)
+
+**Características implementadas:**
+- ✅ Autenticación JWT en todos los endpoints protegidos
+- ✅ Validación automática de permisos por padre
+- ✅ Sistema de notificaciones automáticas entre co-padres
+- ✅ Gestión de colores UI (LILA/CELESTE) por relación padre-hijo
+- ✅ Sistema de aprobación para actividades modificadas por co-padre
+- ✅ Solicitudes de cambio de custodia con aprobación/rechazo
+
 ## Próximos Pasos de Desarrollo
 
-1. **Servicios Business Logic**: HijoService, ActividadService, FechaCustodiaService, etc.
-2. **Controladores REST**: HijoController, ActividadController, NotificacionController, etc.
-3. **Frontend**: Desarrollar componentes React y pantallas de usuario
-4. **Integración**: Conectar frontend PWA con backend REST API
+1. **Frontend React**: Desarrollar componentes y pantallas de usuario
+2. **Integración**: Conectar frontend PWA con backend REST API
+3. **Testing**: Pruebas de integración y end-to-end
+4. **Deploy**: Preparar para producción
 
 ## Ejecución
 
