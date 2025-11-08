@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { invitacionAPI } from '../services/api';
-import './Form.css';
+import './Login.css';
 
 const Invitacion = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,7 +23,7 @@ const Invitacion = () => {
       setSuccess(true);
       setEmail('');
       setTimeout(() => {
-        navigate('/home');
+        navigate('/agregar-hijo');
       }, 2000);
     } catch (err) {
       setError(err.response?.data?.message || 'Error al enviar invitación');
@@ -30,22 +32,24 @@ const Invitacion = () => {
     }
   };
 
-  return (
-    <div className="form-container">
-      <header className="form-header">
-        <button className="btn-back" onClick={() => navigate('/home')}>
-          ← Volver
-        </button>
-        <h1>Invitar co-padre</h1>
-      </header>
+  const handleSkip = () => {
+    navigate('/agregar-hijo');
+  };
 
-      <div className="form-content">
-        <div className="logo-small-center">
-          <h2>We<br/>Parent</h2>
-          <p className="form-subtitle">Invita a un co-padre</p>
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        <div className="logo">
+          <h1>We<br/>Parent</h1>
+          <p className="subtitle">Invita a tu co-padre</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="form">
+        <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label>Email</label>
             <input
@@ -53,14 +57,13 @@ const Invitacion = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@delcopadre.com"
-              required
             />
           </div>
 
           {error && <div className="error-message">{error}</div>}
           {success && (
             <div className="success-message">
-              ¡Invitación enviada exitosamente!
+              ¡Invitación enviada!
             </div>
           )}
 
@@ -68,9 +71,13 @@ const Invitacion = () => {
             {loading ? 'Enviando...' : 'Enviar invitación'}
           </button>
 
-          <div className="form-hint">
-            El co-padre recibirá un email con un enlace para aceptar la invitación.
-          </div>
+          <button type="button" className="btn-secondary" onClick={handleSkip}>
+            Omitir por ahora
+          </button>
+
+          <button type="button" className="btn-secondary" onClick={handleLogout}>
+            Salir
+          </button>
         </form>
       </div>
     </div>
