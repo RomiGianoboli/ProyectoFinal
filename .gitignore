@@ -17,7 +17,7 @@ frontend/*.log
 *.iml
 .vscode/
 
-# Replit
+# Cache & Config
 .upm/
 .cache/
 .config/
