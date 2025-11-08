@@ -32,8 +32,8 @@ const Registro = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+    if (formData.password.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres');
       return;
     }
 
@@ -43,7 +43,24 @@ const Registro = () => {
       await register(formData.nombre, formData.apellido, formData.email, formData.password);
       navigate('/detalles-hijos');
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al registrarse');
+      console.error('Error de registro:', err);
+      
+      // Manejar errores específicos del backend
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (err.response?.data?.errors) {
+        // Si el backend devuelve errores de validación
+        const errores = err.response.data.errors;
+        if (errores.password) {
+          setError(errores.password);
+        } else {
+          setError(Object.values(errores)[0] || 'Error al registrarse');
+        }
+      } else if (err.response?.status === 400) {
+        setError('Los datos ingresados no son válidos. Verifica que la contraseña tenga al menos 8 caracteres.');
+      } else {
+        setError('Error al registrarse. Por favor, intenta nuevamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -101,9 +118,19 @@ const Registro = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Mínimo 8 caracteres"
               required
             />
+            {formData.password.length > 0 && formData.password.length < 8 && (
+              <small style={{ color: '#ff6b6b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                ⚠️ La contraseña debe tener al menos 8 caracteres ({formData.password.length}/8)
+              </small>
+            )}
+            {formData.password.length >= 8 && (
+              <small style={{ color: '#51cf66', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                ✓ Contraseña válida
+              </small>
+            )}
           </div>
 
           <div className="form-group">
