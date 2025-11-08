@@ -31,6 +31,12 @@ public class JwtUtil {
         return crearToken(claims, email);
     }
     
+    public String generarToken(Long padreId, String email) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("email", email);
+        return crearToken(claims, padreId.toString());
+    }
+    
     private String crearToken(Map<String, Object> claims, String subject) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);

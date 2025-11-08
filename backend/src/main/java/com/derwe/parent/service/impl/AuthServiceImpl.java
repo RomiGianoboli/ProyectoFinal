@@ -34,8 +34,8 @@ public class AuthServiceImpl implements AuthService {
         // Registrar al padre usando PadreService
         PadreResponseDTO padreResponse = padreService.registrarPadre(padreRequestDTO);
         
-        // Generar token JWT
-        String token = jwtUtil.generarToken(padreResponse.getEmail());
+        // Generar token JWT con el ID del padre
+        String token = jwtUtil.generarToken(padreResponse.getId(), padreResponse.getEmail());
         
         // Calcular fecha de expiración
         LocalDateTime expiracion = LocalDateTime.now()
@@ -65,8 +65,8 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidCredentialsException("Credenciales inválidas");
         }
         
-        // Generar token JWT
-        String token = jwtUtil.generarToken(padre.getEmail());
+        // Generar token JWT con el ID del padre
+        String token = jwtUtil.generarToken(padre.getId(), padre.getEmail());
         
         // Calcular fecha de expiración
         LocalDateTime expiracion = LocalDateTime.now()
