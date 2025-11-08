@@ -52,9 +52,13 @@ const Invitacion = () => {
         }
       }
 
-      // Si hay email de co-padre, enviar invitación
-      if (formData.emailCoPadre) {
-        await invitacionAPI.enviar({ emailInvitado: formData.emailCoPadre });
+      // Si hay datos de co-padre, enviar invitación
+      if (formData.nombreCoPadre && formData.apellidoCoPadre && formData.emailCoPadre) {
+        await invitacionAPI.enviar({
+          nombreCoPadre: formData.nombreCoPadre,
+          apellidoCoPadre: formData.apellidoCoPadre,
+          emailCoPadre: formData.emailCoPadre
+        });
       }
 
       navigate('/home');
