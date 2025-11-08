@@ -5,12 +5,13 @@ backend/.settings/
 backend/.classpath
 backend/.project
 
-# Frontend
+# Frontend PWA
 frontend/node_modules/
-frontend/.expo/
 frontend/dist/
 frontend/build/
 frontend/*.log
+frontend/.vite/
+frontend/dev-dist/
 
 # IDE
 .idea/
@@ -21,6 +22,9 @@ frontend/*.log
 .upm/
 .cache/
 .config/
+
+# Generated assets
+attached_assets/
 
 # Environment
 .env
