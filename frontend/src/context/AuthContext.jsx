@@ -27,24 +27,24 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await authAPI.login({ email, password });
-    const { token, ...userData } = response.data;
+    const { token, padre } = response.data;
     
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(padre));
+    setUser(padre);
     
-    return userData;
+    return padre;
   };
 
   const register = async (nombre, apellido, email, password) => {
     const response = await authAPI.register({ nombre, apellido, email, password });
-    const { token, ...userData } = response.data;
+    const { token, padre } = response.data;
     
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
-    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(padre));
+    setUser(padre);
     
-    return userData;
+    return padre;
   };
 
   const logout = () => {

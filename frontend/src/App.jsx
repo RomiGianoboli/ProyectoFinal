@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
 import Home from './pages/Home';
+import ListaHijos from './pages/ListaHijos';
+import HomeHijoSeleccionado from './pages/HomeHijoSeleccionado';
 import Calendario from './pages/Calendario';
 import AgregarHijo from './pages/AgregarHijo';
 import Invitacion from './pages/Invitacion';
@@ -31,6 +33,22 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
+          <Route 
+            path="/lista-hijos" 
+            element={
+              <PrivateRoute>
+                <ListaHijos />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/home-hijo" 
+            element={
+              <PrivateRoute>
+                <HomeHijoSeleccionado />
+              </PrivateRoute>
+            } 
+          />
           <Route 
             path="/home" 
             element={

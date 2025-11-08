@@ -61,7 +61,7 @@ const Invitacion = () => {
         });
       }
 
-      navigate('/home');
+      navigate('/lista-hijos');
     } catch (err) {
       setError(err.response?.data?.message || 'Error al procesar la información');
     } finally {
