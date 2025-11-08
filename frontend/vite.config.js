@@ -9,24 +9,27 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
-        name: 'DerWeParent - Coordinación Parental',
-        short_name: 'DerWeParent',
+        name: 'We Parent - Coordinación Parental',
+        short_name: 'We Parent',
         description: 'Sistema integral de coordinación parental para gestión de actividades y custodia',
-        theme_color: '#FF6B35',
-        background_color: '#ffffff',
+        theme_color: '#ff9b71',
+        background_color: '#f5f0e8',
         display: 'standalone',
         scope: '/',
         start_url: '/',
+        orientation: 'portrait',
         icons: [
           {
             src: '/icon-192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           },
           {
             src: '/icon-512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           }
         ]
       },
