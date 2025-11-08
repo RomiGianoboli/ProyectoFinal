@@ -50,8 +50,13 @@ public class JwtUtil {
                 .compact();
     }
     
-    public String extraerEmail(String token) {
+    public String extraerPadreId(String token) {
         return extraerClaim(token, Claims::getSubject);
+    }
+    
+    public String extraerEmail(String token) {
+        Claims claims = extraerTodosClaims(token);
+        return claims.get("email", String.class);
     }
     
     public Date extraerExpiracion(String token) {
