@@ -26,15 +26,18 @@ ProyectoFinal/
 │   │   │       └── application.properties
 │   │   └── test/
 │   └── pom.xml
-├── frontend/             # Frontend React Native (en configuración)
+├── frontend/             # Frontend PWA React + Vite (configurado)
 │   ├── src/
-│   │   ├── screens/
 │   │   ├── components/
 │   │   ├── services/
-│   │   ├── navigation/
 │   │   ├── context/
-│   │   └── utils/
-│   ├── App.js
+│   │   ├── App.jsx
+│   │   ├── main.jsx
+│   │   ├── App.css
+│   │   └── index.css
+│   ├── public/
+│   ├── index.html
+│   ├── vite.config.js
 │   └── package.json
 ├── database/
 │   └── migrations/
@@ -55,15 +58,22 @@ ProyectoFinal/
 - `application.properties` - Configuración de BD y JWT
 - `DerWeParentApplication.java` - Clase principal Spring Boot
 
-### Frontend
-- **Framework**: React Native con Expo 49.0
-- **React**: 18.2.0
-- **Navegación**: React Navigation (configurado)
-- **HTTP**: Axios (configurado)
+### Frontend (PWA)
+- **Framework**: React 18.2.0 + Vite 5.0.8
+- **Tipo**: Progressive Web App (PWA)
+- **Puerto**: 5000 (0.0.0.0)
+- **Navegación**: React Router DOM 6.20
+- **HTTP**: Axios 1.6.2
+- **PWA**: vite-plugin-pwa con Workbox
 
 **Archivos creados:**
-- `package.json` - Dependencias npm configuradas
-- `App.js` - Componente principal React Native
+- `package.json` - Dependencias npm y scripts
+- `vite.config.js` - Configuración de Vite, PWA y proxy al backend
+- `index.html` - Punto de entrada HTML
+- `src/main.jsx` - Entry point React
+- `src/App.jsx` - Componente principal con enrutamiento
+- `src/App.css` - Estilos principales
+- `src/index.css` - Estilos globales
 
 ## Tecnologías Configuradas
 
@@ -76,12 +86,16 @@ ProyectoFinal/
 - Lombok
 - Validation
 
-### Frontend
-- Expo ~49.0.0
-- React Native 0.72.6
-- React Navigation
-- Axios
-- React Native Calendars
+### Frontend (PWA)
+- React 18.2.0
+- React DOM 18.2.0
+- React Router DOM 6.20
+- Vite 5.0.8
+- @vitejs/plugin-react 4.2.1
+- vite-plugin-pwa 0.17.4
+- Axios 1.6.2
+- Service Worker (generado automáticamente)
+- Web App Manifest (configurado)
 
 ## Próximos Pasos de Desarrollo
 
@@ -105,8 +119,10 @@ mvn spring-boot:run
 ```bash
 cd frontend
 npm install
-npm start
+npm run dev
 ```
+
+La aplicación PWA se ejecutará en http://localhost:5000 con hot reload.
 
 ## Funcionalidades Planificadas
 - Registro e invitación de co-padres
