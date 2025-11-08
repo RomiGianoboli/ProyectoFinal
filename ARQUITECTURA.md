@@ -12,6 +12,34 @@ Estilo de comunicación preferido: Lenguaje simple y cotidiano.
 
 ## Arquitectura del Sistema
 
+### Patrones Arquitectónicos Implementados
+
+**Backend: Patrón MVC Adaptado para APIs REST (Arquitectura en Capas)**
+
+El backend implementa una arquitectura en capas basada en el patrón Model-View-Controller (MVC), adaptado para servicios REST modernos:
+
+- **Model (Modelo)**: Entidades JPA + DTOs que representan el dominio del negocio
+- **View (Vista)**: DTOs de Response que serializan a JSON (en REST no hay vistas HTML tradicionales)
+- **Controller (Controlador)**: REST Controllers que manejan peticiones HTTP
+
+**Capas adicionales siguiendo mejores prácticas de Spring Boot:**
+- **Service (Servicio)**: Lógica de negocio separada del controlador
+- **Repository (Repositorio)**: Acceso a datos mediante patrón DAO (Data Access Object)
+
+Esta separación proporciona:
+- ✅ Separación de responsabilidades (Separation of Concerns)
+- ✅ Testabilidad independiente de cada capa
+- ✅ Mantenibilidad y escalabilidad del código
+- ✅ Reutilización de lógica de negocio
+
+**Frontend: Arquitectura Basada en Componentes**
+
+El frontend React utiliza arquitectura basada en componentes con:
+- **Componentes React**: Vistas reutilizables y modulares
+- **Context API**: Gestión de estado global (AuthContext)
+- **Servicios API**: Capa de comunicación con backend
+- **React Router**: Enrutamiento del lado del cliente
+
 ### Arquitectura del Frontend
 
 **Stack Tecnológico:**
@@ -56,9 +84,49 @@ Estilo de comunicación preferido: Lenguaje simple y cotidiano.
 - Base de datos PostgreSQL (H2 para desarrollo)
 - Backend corriendo en puerto 8080
 
-**Capas Arquitectónicas:**
+**Arquitectura en Capas (Patrón MVC para APIs REST):**
 
-1. **Capa de Controladores** (8 Controladores REST):
+```
+┌───────────────────────────────────────────────────────────┐
+│                    CAPA CONTROLLER                        │
+│  (Controlador - Maneja peticiones HTTP)                  │
+│  - AuthController, HijoController, ActividadController    │
+│  - 8 REST Controllers con endpoints @GetMapping, @Post   │
+│  - Responsabilidad: Validar entrada, delegar a Service   │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      ▼
+┌───────────────────────────────────────────────────────────┐
+│                    CAPA SERVICE                           │
+│  (Lógica de Negocio)                                     │
+│  - AuthService, HijoService, ActividadService            │
+│  - 9 Services con @Transactional                         │
+│  - Responsabilidad: Reglas de negocio, orquestación      │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      ▼
+┌───────────────────────────────────────────────────────────┐
+│                  CAPA REPOSITORY                          │
+│  (Acceso a Datos - Patrón DAO)                           │
+│  - PadreRepository, HijoRepository, ActividadRepository   │
+│  - 8 JPA Repositories que extienden JpaRepository        │
+│  - Responsabilidad: Operaciones CRUD y queries SQL       │
+└─────────────────────┬─────────────────────────────────────┘
+                      │
+                      ▼
+┌───────────────────────────────────────────────────────────┐
+│                     CAPA MODEL                            │
+│  (Modelo de Dominio)                                     │
+│  - Entidades: Padre, Hijo, Actividad, Notificacion      │
+│  - DTOs: Request/Response para API                       │
+│  - Enums: EstadoActividad, TipoNotificacion             │
+│  - Responsabilidad: Representar datos del dominio        │
+└───────────────────────────────────────────────────────────┘
+```
+
+**Detalle de Capas:**
+
+**1. Capa Controller (8 Controladores REST - "C" de MVC):**
    - AuthController - Autenticación y autorización
    - InvitacionController - Gestión de invitaciones a co-padres
    - HijoController - Gestión de perfiles de hijos
@@ -68,22 +136,24 @@ Estilo de comunicación preferido: Lenguaje simple y cotidiano.
    - NotificacionController - Entrega de notificaciones
    - CalendarioController - Agregación y vistas de calendario
 
-2. **Capa de Servicios** (9 Servicios de Negocio):
+**2. Capa Service (9 Servicios de Negocio):**
    - Contiene lógica de negocio y orquestación entre repositorios
    - Maneja validación, controles de autorización y operaciones complejas
    - Los servicios reflejan los controladores más PadreService para gestión de padres
+   - Transaccionalidad (@Transactional) garantiza integridad de datos
 
-3. **Capa de Repositorios** (8 Repositorios JPA):
+**3. Capa Repository (8 Repositorios JPA - Patrón DAO):**
    - Métodos de consulta personalizados para recuperación compleja de datos
-   - Aprovecha Spring Data JPA para operaciones CRUD
+   - Aprovecha Spring Data JPA para operaciones CRUD automáticas
+   - Abstrae la persistencia de datos del resto de la aplicación
 
-4. **Objetos de Transferencia de Datos**:
+**4. DTOs - Data Transfer Objects ("V" de MVC en APIs REST):**
    - 7 DTOs de Request para validación de datos entrantes
-   - 10 DTOs de Response para respuestas API consistentes
+   - 10 DTOs de Response para respuestas API consistentes (JSON = "Vista")
    - La separación asegura seguridad (no exposición de entidades) y flexibilidad de versionado de API
 
-5. **Modelo de Dominio**:
-   - 8 Entidades representando objetos de negocio principales
+**5. Modelo de Dominio ("M" de MVC):**
+   - 8 Entidades JPA representando objetos de negocio principales
    - 5 Enums para seguridad de tipos y gestión de estado
    - Relaciones JPA configuradas para asociaciones padre-hijo
 

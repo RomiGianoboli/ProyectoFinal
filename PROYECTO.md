@@ -20,6 +20,27 @@ Sistema integral de coordinación parental para gestionar actividades, fechas de
 - PWA con service worker y manifest
 - Frontend corriendo en puerto 5000
 
+## Patrones Arquitectónicos
+
+### Backend: Patrón MVC (Model-View-Controller) para APIs REST
+
+El backend implementa **arquitectura en capas** basada en el patrón MVC adaptado para servicios REST:
+
+- **Model (Modelo)**: 8 Entidades JPA + 17 DTOs
+- **View (Vista)**: DTOs Response que se serializan a JSON 
+- **Controller (Controlador)**: 8 REST Controllers
+
+**Capas adicionales (mejores prácticas Spring Boot):**
+- **Service**: Lógica de negocio (9 servicios)
+- **Repository**: Acceso a datos - Patrón DAO (8 repositorios JPA)
+
+### Frontend: Arquitectura Basada en Componentes
+
+- Componentes React funcionales reutilizables
+- Context API para estado global
+- Servicios API para comunicación con backend
+- React Router para navegación
+
 ## Estructura del Proyecto
 
 ```

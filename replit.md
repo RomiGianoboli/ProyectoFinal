@@ -1,15 +1,10 @@
-# We Parent - Parental Coordination System
+# DerWeParent - Parental Coordination System
 
 ## Overview
 
-We Parent (DerWeParent) is a comprehensive Progressive Web Application (PWA) designed for parental coordination and co-parenting management. The system enables parents to manage activities, custody dates, and communication between co-parents through an intuitive web interface.
+DerWeParent ("We Parent") is a comprehensive Progressive Web Application (PWA) for parental coordination designed to manage activities, custody schedules, and communication between co-parents. The application is a full-stack solution with a Spring Boot REST API backend and a React PWA frontend. The backend is fully implemented and operational (67 Java files compiled), while the frontend is configured and ready for development.
 
-The application is a full-stack solution with:
-- **Backend**: RESTful API built with Spring Boot (Java 17)
-- **Frontend**: Progressive Web Application built with React 18.2
-- **Database**: PostgreSQL (production) / H2 (development)
-
-The project is fully implemented and operational, with both frontend and backend tested and ready for deployment.
+The system helps divorced or separated parents coordinate childcare responsibilities, track activities, manage custody schedules, and maintain organized communication about their children.
 
 ## User Preferences
 
@@ -17,135 +12,164 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Frontend Architecture
-
-**Technology Stack:**
-- React 18.2 with Vite 5.0.8 as build tool
-- Progressive Web App (PWA) with service worker and manifest
-- React Router 6.20 for client-side routing
-- Axios 1.6.2 for HTTP requests with JWT interceptors
-- Development server running on port 5000
-
-**Implemented Features:**
-- Complete authentication system (Login, Register) with JWT persistence
-- Dashboard/Home with child selector and navigation
-- Monthly calendar view with activities and custody dates (PURPLE/LIGHT BLUE color coding)
-- Full CRUD for activities (list, create, edit, delete)
-- Custody management with monthly navigation
-- Notification center with read/unread status
-- Child management (add child, invite co-parent)
-- Protected routes with PrivateRoute component
-- LocalStorage persistence for authentication and child selection
-
-**Key Design Decisions:**
-
-1. **PWA Implementation**: Provides offline capabilities and native-like app experience without requiring app store distribution. Service worker caches API responses using NetworkFirst strategy for optimal performance.
-
-2. **Vite Build System**: Selected for faster development builds and better performance compared to traditional bundlers. Provides hot module replacement and optimized production builds.
-
-3. **Component Architecture**: Functional components with React hooks for state management. AuthContext provides centralized authentication state across the application.
-
-4. **Environment Variables**: API URL configured via VITE_API_URL for environment flexibility (localhost in development, relative path in production).
-
-5. **LocalStorage Persistence**: Child selection persists between sessions to support PWA deep-linking and navigation continuity.
-
-**Configuration:**
-- Custom theme colors: Orange/Peach (#ff9b71) primary, Beige/Cream (#f5f0e8) background
-- "We Parent" branding throughout application
-- Gradient-based UI design system matching Figma mockups
-- Responsive design with mobile-first approach
-- Service worker configured for API caching with NetworkFirst strategy
-- PWA meta tags for Apple iOS installation support
-
-### Backend Architecture
+### Backend Architecture: Layered MVC Pattern for REST APIs
 
 **Technology Stack:**
 - Java 17
 - Spring Boot 3.2
 - Spring Security with JWT authentication
 - Spring Data JPA for data persistence
-- PostgreSQL database (production) / H2 (development)
-- Backend server running on port 8080
+- PostgreSQL (production) / H2 (development)
+- Running on port 8080
 
-**Implementation Status:**
-- 67 compiled Java files fully operational
-- 8 REST Controllers with JWT authentication
-- 9 Services with complete business logic
-- 8 JPA Repositories with custom queries
-- 17 DTOs (Request/Response objects)
-- Complete JWT security system
+**Architecture Pattern:**
+The backend implements a layered architecture based on the Model-View-Controller (MVC) pattern, adapted for modern REST services:
 
-**Core Components:**
+- **Model Layer**: 8 JPA entities + 17 DTOs representing business domain
+- **View Layer**: Response DTOs serialized to JSON (no traditional HTML views in REST)
+- **Controller Layer**: 8 REST Controllers handling HTTP requests
+- **Service Layer**: 9 services containing business logic, separated from controllers
+- **Repository Layer**: 8 JPA repositories following the DAO (Data Access Object) pattern with custom queries
 
-1. **REST Controllers (8 endpoints)**:
-   - AuthController: User registration and login
-   - InvitacionController: Co-parent invitations
-   - HijoController: Child management
-   - ActividadController: Activity CRUD operations
-   - FechaCustodiaController: Custody date management
-   - SolicitudCambioController: Change requests
-   - NotificacionController: Notification system
-   - CalendarioController: Calendar aggregation
+**Architectural Benefits:**
+- Separation of concerns across distinct layers
+- Independent testability of each layer
+- Maintainable and scalable codebase
+- Business logic reusability
 
-2. **Service Layer (9 services)**: 
-   - Implements all business logic
-   - Handles data validation and transformation
-   - Manages relationships between entities
+**Security:**
+- JWT (JSON Web Token) based authentication
+- Token stored in localStorage on client side
+- Bearer token sent in Authorization header
+- 401 responses trigger automatic logout and redirect to login
 
-3. **Repository Layer (8 JPA repositories)**:
-   - Data access abstraction
-   - Custom query methods
-   - Relationship management
+### Frontend Architecture: Component-Based React Application
 
-4. **Domain Model**:
-   - 8 JPA entities (Padre, Hijo, Actividad, FechaCustodia, etc.)
-   - 5 enums for type safety
-   - Bidirectional relationships
+**Technology Stack:**
+- React 18.2 with functional components
+- Vite 5.0.8 as build tool and development server
+- React Router 6.20 for client-side routing
+- Axios 1.6.2 for HTTP requests with JWT interceptors
+- PWA capabilities with service worker and manifest
+- Running on port 5000 (development server on 0.0.0.0 for network access)
 
-**Security Architecture:**
-- JWT-based authentication with Bearer tokens
-- Token interceptor on frontend for automatic header injection
-- 401 response handling with automatic logout and redirect
-- Stateless session management
+**Architecture Pattern:**
+- **Component-Based Architecture**: Reusable, modular React components
+- **Context API**: Global state management (AuthContext for authentication)
+- **API Service Layer**: Centralized HTTP communication with backend (api.js)
+- **Client-Side Routing**: React Router for SPA navigation
+- **PWA Features**: Service worker for offline capability, manifest for installability
+
+**Key Pages:**
+- Login/Registration (Form.jsx, Login.jsx)
+- Home dashboard (Home.jsx)
+- Activities management (Actividades.jsx)
+- Custody schedule (Custodias.jsx, Calendario.jsx)
+- Notifications (Notificaciones.jsx)
+
+**Styling Approach:**
+- Component-scoped CSS files
+- Consistent design system with CSS variables
+- Mobile-first responsive design
+- Gradient backgrounds and modern UI patterns
+
+### Communication Pattern
+
+**REST API Architecture:**
+- Backend exposes RESTful endpoints
+- Frontend consumes endpoints via Axios service layer
+- Request/Response cycle uses JSON serialization
+- JWT tokens authenticate each request via interceptor
+
+**API Structure:**
+- `/auth/*` - Authentication endpoints (register, login, validate)
+- `/hijos/*` - Children management endpoints
+- `/actividades/*` - Activities endpoints
+- Additional endpoints for custody, notifications, etc.
+
+### Data Flow
+
+1. User interacts with React components
+2. Components call API service functions (api.js)
+3. Axios interceptor adds JWT token to request headers
+4. Backend REST controller receives request
+5. Controller delegates to Service layer
+6. Service executes business logic and calls Repository
+7. Repository performs database operations via JPA
+8. Response flows back through layers as DTOs
+9. Frontend receives JSON response and updates UI
+
+### PWA Capabilities
+
+**Manifest Configuration:**
+- App name: "We Parent - Coordinación Parental"
+- Theme color: #ff9b71
+- Background color: #f5f0e8
+- Display mode: standalone (appears as native app)
+- Orientation: portrait
+- Icons: 192x192 and 512x512 (maskable)
+
+**Service Worker:**
+- Auto-update registration type
+- Runtime caching for API calls with NetworkFirst strategy
+- Cache expiration: max 50 entries, 300 seconds max age
+- Offline functionality for previously visited pages
 
 ## External Dependencies
+
+### Backend Dependencies
+
+**Core Framework:**
+- Spring Boot 3.2 - Application framework
+- Spring Web - REST API development
+- Spring Data JPA - Database abstraction and ORM
+- Spring Security - Authentication and authorization
+
+**Database:**
+- PostgreSQL - Production relational database
+- H2 Database - Development/testing in-memory database
+
+**Security:**
+- JWT (JSON Web Tokens) - Stateless authentication mechanism
+- BCrypt - Password hashing (likely via Spring Security)
+
+**Build Tool:**
+- Maven - Dependency management and build automation
 
 ### Frontend Dependencies
 
 **Core Libraries:**
-- `react` (^18.2.0): UI framework
-- `react-dom` (^18.2.0): React DOM rendering
-- `react-router-dom` (^6.20.0): Client-side routing
-- `axios` (^1.6.2): HTTP client with interceptor support
+- React 18.2.0 - UI library
+- React DOM 18.2.0 - DOM rendering
+- React Router DOM 6.20.0 - Client-side routing
+
+**HTTP Client:**
+- Axios 1.6.2 - Promise-based HTTP client with interceptor support
 
 **Build Tools:**
-- `vite` (^5.0.8): Build tool and dev server
-- `@vitejs/plugin-react` (^4.2.1): React support for Vite
-- `vite-plugin-pwa` (^0.17.4): PWA manifest and service worker generation
+- Vite 5.0.8 - Fast build tool and dev server
+- @vitejs/plugin-react 4.2.1 - React integration for Vite
+- vite-plugin-pwa 0.17.4 - PWA manifest and service worker generation
 
-### Backend Dependencies
+**Environment Configuration:**
+- `.env` file for environment variables (example: `.env.example`)
+- `VITE_API_URL` - Backend API base URL configuration
 
-**Spring Boot Ecosystem:**
-- Spring Boot 3.2: Application framework
-- Spring Security: JWT authentication and authorization
-- Spring Data JPA: Data persistence layer
-- Spring Web: REST API support
+### Development Infrastructure
 
-**Database:**
-- PostgreSQL: Production database
-- H2: Development/testing database
+**Frontend Development Server:**
+- Vite dev server on port 5000
+- Configured to listen on 0.0.0.0 (network accessible)
+- Hot module replacement for rapid development
 
-### Configuration
+**Backend Server:**
+- Spring Boot embedded Tomcat on port 8080
+- Development and production profiles available
 
-**Environment Variables (Frontend):**
-- `VITE_API_URL`: Backend API base URL
-  - Development: `http://localhost:8080` (or as configured)
-  - Production: Relative path `/api`
+### Database Schema
 
-**Ports:**
-- Frontend development server: 5000
-- Backend API server: 8080
+**Entities (8 total):**
+The system manages entities for users, children (hijos), activities (actividades), custody schedules (custodias), and notifications. Specific entity details would be found in the backend JPA entity classes.
 
-**Data Storage:**
-- LocalStorage: JWT token, user data, selected child ID
-- Service Worker Cache: API responses (NetworkFirst strategy, 5-minute expiration)
+**DTOs (17 total):**
+Separate Request and Response DTOs ensure clean API contracts and prevent over/under-fetching of data.
