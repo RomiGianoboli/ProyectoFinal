@@ -26,6 +26,12 @@ frontend/dev-dist/
 # Generated assets
 attached_assets/
 
+# Replit
+.replit
+.replit.nix
+replit.nix
+replit.md
+
 # Environment
 .env
 *.env.local
