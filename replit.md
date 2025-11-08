@@ -112,14 +112,57 @@ ProyectoFinal/
 ✅ **Repositorios**: 8 interfaces JPA Repository con queries personalizadas
 ✅ **Base de Datos**: PostgreSQL persistente con 8 tablas y relaciones
 ✅ **Frontend PWA**: React + Vite configurado con service worker
+✅ **Autenticación JWT**: Sistema completo production-ready
+✅ **Manejo de Excepciones**: GlobalExceptionHandler con códigos HTTP apropiados
+✅ **Servicios**: PadreService y AuthService implementados
+✅ **Controladores**: AuthController con endpoints /register, /login y /validate
+
+### Sistema de Autenticación (COMPLETADO - 08/11/2025)
+
+**Servicios (2 archivos):**
+- `PadreService` - Registro de padres con validación de email duplicado
+- `AuthService` - Login, validación de tokens, generación JWT
+
+**DTOs (7 archivos):**
+- Request: PadreRequestDTO, LoginRequestDTO, InvitacionRequestDTO, HijoRequestDTO, ActividadRequestDTO, SolicitudCambioRequestDTO, FechaCustodiaRequestDTO
+- Response: PadreResponseDTO (sin password), LoginResponseDTO (token + datos)
+
+**Excepciones Personalizadas (4 archivos):**
+- `DuplicateEmailException` → HTTP 409 CONFLICT
+- `InvalidCredentialsException` → HTTP 401 UNAUTHORIZED
+- `AccountDeactivatedException` → HTTP 403 FORBIDDEN
+- `ResourceNotFoundException` → HTTP 404 NOT FOUND
+
+**GlobalExceptionHandler:**
+- Maneja excepciones personalizadas con códigos HTTP apropiados
+- Validación de campos → HTTP 400 BAD REQUEST
+- Errores genéricos → HTTP 500 (sin exponer detalles internos)
+
+**Seguridad:**
+- `JwtUtil` - Generación y validación de tokens con secret key y expiración de 24h
+- `SecurityConfig` - CORS habilitado, endpoints públicos (/register, /login), filtro JWT
+- `JwtAuthenticationFilter` - Validación automática de tokens en requests
+- `CustomUserDetailsService` - Carga usuarios desde PadreRepository
+
+**Endpoints REST API:**
+- `POST /api/auth/register` - Registro de nuevos padres/tutores (HTTP 201)
+- `POST /api/auth/login` - Login con email/password (HTTP 200)
+- `GET /api/auth/validate` - Validación de token JWT (HTTP 200/401)
+
+**Pruebas Manuales Exitosas:**
+✅ Registro de usuario nuevo → HTTP 201 + JWT token
+✅ Login con credenciales válidas → HTTP 200 + JWT token
+✅ Validación de token válido → HTTP 200 (true)
+✅ Email duplicado → HTTP 409 CONFLICT
+✅ Credenciales inválidas → HTTP 401 UNAUTHORIZED
+✅ Header Authorization faltante → HTTP 401 UNAUTHORIZED
 
 ## Próximos Pasos de Desarrollo
 
-1. **Servicios**: Desarrollar lógica de negocio
-2. **Seguridad**: Implementar autenticación JWT completa
-3. **Controladores**: Crear endpoints REST API
-4. **Frontend**: Desarrollar componentes y pantallas
-5. **Integración**: Conectar frontend con backend
+1. **Servicios Business Logic**: HijoService, ActividadService, FechaCustodiaService, etc.
+2. **Controladores REST**: HijoController, ActividadController, NotificacionController, etc.
+3. **Frontend**: Desarrollar componentes React y pantallas de usuario
+4. **Integración**: Conectar frontend PWA con backend REST API
 
 ## Ejecución
 
