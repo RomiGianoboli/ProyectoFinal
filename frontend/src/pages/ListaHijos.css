@@ -1,0 +1,151 @@
+.lista-hijos-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F7F0E7 0%, #ffe8d6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.lista-hijos-card {
+  background: #F7F0E7;
+  border: 3px solid #7dd3fc;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 450px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.header-lista {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.logo-lista h1 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.btn-notification {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  font-size: 32px;
+}
+
+.bell-icon {
+  color: #ff9b71;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.greeting-section {
+  margin-bottom: 40px;
+}
+
+.greeting-section h2 {
+  font-size: 22px;
+  font-weight: 400;
+  color: #2c3e50;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.hijos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.hijo-card {
+  background: white;
+  border: 2px solid #7dd3fc;
+  border-radius: 16px;
+  padding: 50px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+}
+
+.hijo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  background: #f8fafc;
+}
+
+.hijo-card:active {
+  transform: translateY(-2px);
+}
+
+.hijo-nombre {
+  font-size: 18px;
+  font-weight: 500;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.empty-hijos {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-hijos p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.btn-salir {
+  width: 100%;
+  padding: 16px;
+  background: white;
+  border: 2px solid #ff9b71;
+  border-radius: 12px;
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-salir:hover {
+  background: #fff5f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 155, 113, 0.2);
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 18px;
+}
+
+@media (max-width: 480px) {
+  .lista-hijos-card {
+    padding: 30px 20px;
+  }
+
+  .logo-lista h1 {
+    font-size: 38px;
+  }
+
+  .hijos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hijo-card {
+    padding: 40px 20px;
+  }
+}

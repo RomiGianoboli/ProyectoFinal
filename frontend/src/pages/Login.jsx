@@ -18,7 +18,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/home');
+      navigate('/lista-hijos');
     } catch (err) {
       setError(err.response?.data?.message || 'Error al iniciar sesión');
     } finally {

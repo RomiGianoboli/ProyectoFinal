@@ -51,11 +51,7 @@ function App() {
           />
           <Route 
             path="/home" 
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            } 
+            element={<Navigate to="/lista-hijos" replace />} 
           />
           <Route 
             path="/calendario" 
