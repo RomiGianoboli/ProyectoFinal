@@ -1,20 +1,20 @@
 .lista-hijos-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #F7F0E7 0%, #ffe8d6 100%);
+  background: #f5f0e8;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 0;
 }
 
 .lista-hijos-card {
-  background: #F7F0E7;
-  border: 3px solid #7dd3fc;
-  border-radius: 24px;
+  background: #f5f0e8;
+  border: none;
+  border-radius: 0;
   width: 100%;
   max-width: 450px;
   padding: 40px 30px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  min-height: 100vh;
 }
 
 .header-lista {
@@ -25,10 +25,10 @@
 }
 
 .logo-lista h1 {
-  font-size: 48px;
+  font-size: 28px;
   font-weight: 700;
-  line-height: 1.1;
-  color: #2c3e50;
+  line-height: 1.2;
+  color: #000000;
   margin: 0;
 }
 
@@ -55,6 +55,18 @@
   color: #2c3e50;
   margin: 0;
   line-height: 1.4;
+}
+
+.titulo-hijos {
+  margin-bottom: 20px;
+}
+
+.titulo-hijos h3 {
+  font-size: 16px;
+  font-weight: 500;
+  color: #666;
+  margin: 0;
+  text-align: left;
 }
 
 .hijos-grid {

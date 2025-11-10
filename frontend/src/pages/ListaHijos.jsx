@@ -59,6 +59,10 @@ const ListaHijos = () => {
           <h2>Bienvenido {user?.nombre || ''}</h2>
         </div>
 
+        <div className="titulo-hijos">
+          <h3>Selecciona un hijo</h3>
+        </div>
+
         {hijos.length === 0 ? (
           <div className="empty-hijos">
             <p>No tienes hijos registrados</p>
