@@ -232,7 +232,7 @@ const SolicitarCambio = () => {
           background: 'white',
           borderRadius: '12px'
         }}>
-          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>¿Qué días lo tienes?</h3>
+          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>¿Qué días necesitas cambiar?</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>
@@ -273,13 +273,13 @@ const SolicitarCambio = () => {
 
         <div className="calendario-acciones">
           <button 
-            className="btn-volver-cal" 
+            className="btn-accion-secondary" 
             onClick={() => navigate('/calendario', { state: { hijo } })}
           >
             Volver
           </button>
           <button 
-            className="btn-establecer-custodia" 
+            className="btn-accion-primary" 
             onClick={handleEnviarSolicitud}
             disabled={enviando || !fechaDesde || !fechaHasta}
           >

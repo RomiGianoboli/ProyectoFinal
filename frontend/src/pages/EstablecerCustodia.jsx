@@ -221,13 +221,13 @@ const EstablecerCustodia = () => {
 
         <div className="calendario-acciones">
           <button 
-            className="btn-volver-cal" 
+            className="btn-accion-secondary" 
             onClick={() => navigate('/calendario', { state: { hijo } })}
           >
             Cancelar
           </button>
           <button 
-            className="btn-establecer-custodia" 
+            className="btn-accion-primary" 
             onClick={handleGuardar}
             disabled={guardando || diasSeleccionados.length === 0}
           >
