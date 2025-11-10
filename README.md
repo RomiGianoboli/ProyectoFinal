@@ -1,4 +1,4 @@
-# DerWeParent - Sistema de Coordinación Parental
+# WeParent - Sistema de Coordinación Parental
 
 ## Descripción
 Sistema integral de coordinación parental para gestionar actividades, fechas de custodia y comunicación entre co-padres.
