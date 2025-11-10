@@ -163,8 +163,15 @@ const SolicitarCambio = () => {
     <div className="calendario-page">
       <div className="calendario-container">
         <div className="calendario-header">
-          <h1 className="logo-calendario">We<br/>Parent</h1>
-          <button className="btn-notification">🔔</button>
+          <div className="logo-calendario">
+            <h1>We<br/>Parent</h1>
+          </div>
+          <button 
+            className="btn-notification-cal" 
+            onClick={() => navigate('/notificaciones')}
+          >
+            🔔
+          </button>
         </div>
 
         {hijo.colorPadre && (
