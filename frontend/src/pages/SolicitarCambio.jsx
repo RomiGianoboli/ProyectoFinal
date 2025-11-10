@@ -193,31 +193,37 @@ const SolicitarCambio = () => {
           </p>
         )}
 
-        <div className="mes-navegacion">
-          <button onClick={mesAnterior} className="btn-mes">←</button>
-          <h2 className="mes-titulo">{nombresMeses[fechaActual.getMonth()]} {fechaActual.getFullYear()}</h2>
-          <button onClick={mesSiguiente} className="btn-mes">→</button>
-        </div>
+        <div className="calendario-card">
+          <div className="mes-navegacion">
+            <button onClick={mesAnterior} className="btn-nav">
+              <span>&lt;</span>
+            </button>
+            <h2 className="mes-titulo">{nombresMeses[fechaActual.getMonth()]} {fechaActual.getFullYear()}</h2>
+            <button onClick={mesSiguiente} className="btn-nav">
+              <span>&gt;</span>
+            </button>
+          </div>
 
-        <p style={{ textAlign: 'center', marginBottom: '16px', color: '#666' }}>
-          ¿Qué días quieres intercambiar?
-        </p>
+          <p style={{ textAlign: 'center', marginBottom: '16px', color: '#666' }}>
+            ¿Qué días quieres intercambiar?
+          </p>
 
-        <div className="semana-header">
-          {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((dia, index) => (
-            <div key={index} className="dia-semana">{dia}</div>
-          ))}
-        </div>
+          <div className="dias-semana-row">
+            {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((dia, index) => (
+              <div key={index} className="dia-semana-header">{dia}</div>
+            ))}
+          </div>
 
-        <div className="calendario-grid">
-          {getDiasDelMes().map((dia, index) => (
-            <div
-              key={index}
-              className={getDiaClase(dia)}
-            >
-              {dia.vacio ? '' : dia.numero}
-            </div>
-          ))}
+          <div className="dias-grid">
+            {getDiasDelMes().map((dia, index) => (
+              <div
+                key={index}
+                className={getDiaClase(dia)}
+              >
+                {dia.vacio ? '' : dia.numero}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="seleccion-fechas" style={{ 
