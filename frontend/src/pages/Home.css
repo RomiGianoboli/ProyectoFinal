@@ -156,6 +156,72 @@
   color: #666;
 }
 
+.btn-notification-header {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.btn-notification-header:hover {
+  transform: scale(1.1);
+}
+
+.btn-notification-header .notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.btn-logout-icon {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.btn-logout-icon:hover {
+  transform: scale(1.1);
+}
+
+.btn-cambiar-hijo {
+  background: white;
+  border: 2px solid #ff9b71;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ff9b71;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-cambiar-hijo:hover {
+  background: #f5f0e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 155, 113, 0.2);
+}
+
 @media (max-width: 480px) {
   .menu-grid {
     grid-template-columns: 1fr;

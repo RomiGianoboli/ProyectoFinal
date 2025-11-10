@@ -54,33 +54,46 @@ const HomeHijoSeleccionado = () => {
           <div className="logo-small">
             <h2>We<br/>Parent</h2>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <button 
-              className="btn-icon" 
-              onClick={handleVolver}
-              style={{
-                background: 'white',
-                border: '2px solid #7dd3fc',
-                borderRadius: '8px',
-                padding: '8px 16px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                color: '#2c3e50'
-              }}
+              className="btn-notification-header" 
+              onClick={() => navigate('/notificaciones')}
+              style={{ position: 'relative' }}
             >
-              ← Cambiar hijo
+              🔔
+              {notificacionesCount > 0 && (
+                <span className="notification-badge">
+                  {notificacionesCount}
+                </span>
+              )}
             </button>
-            <button className="btn-logout" onClick={handleLogout}>
-              Salir
+            <button 
+              className="btn-logout-icon" 
+              onClick={handleLogout}
+              title="Salir"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff9b71" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
             </button>
           </div>
         </div>
         
         <div className="user-greeting">
           <h1>¡Hola, {user?.nombre || ''}!</h1>
-          <p style={{ fontSize: '18px', marginTop: '10px', color: '#666' }}>
-            Hijo: <strong>{hijoSeleccionado.nombre} {hijoSeleccionado.apellido}</strong>
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '10px' }}>
+            <p style={{ fontSize: '18px', color: '#666', margin: 0 }}>
+              Hijo: <strong>{hijoSeleccionado.nombre} {hijoSeleccionado.apellido}</strong>
+            </p>
+            <button 
+              className="btn-cambiar-hijo" 
+              onClick={handleVolver}
+            >
+              ← Cambiar hijo
+            </button>
+          </div>
         </div>
       </header>
 
