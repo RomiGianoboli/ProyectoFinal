@@ -12,6 +12,7 @@ const Calendario = () => {
   const [fechaActual, setFechaActual] = useState(new Date());
   const [calendario, setCalendario] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [colorSeleccionado, setColorSeleccionado] = useState('lila');
 
   useEffect(() => {
     const hijoGuardado = localStorage.getItem('hijoSeleccionado');
@@ -21,7 +22,7 @@ const Calendario = () => {
     } else if (hijoGuardado) {
       setHijo(JSON.parse(hijoGuardado));
     } else {
-      navigate('/home');
+      navigate('/lista-hijos');
       return;
     }
   }, [hijoFromState, navigate]);
@@ -65,25 +66,39 @@ const Calendario = () => {
       clases.push(`custodia-${dia.colorCustodia.toLowerCase()}`);
     }
     
-    if (dia.cantidadActividades > 0) {
-      clases.push('tiene-actividades');
-    }
-    
-    if (dia.tieneCambioSolicitado) {
-      clases.push('tiene-solicitud');
-    }
-    
-    const hoy = new Date();
-    const fechaDia = new Date(dia.fecha);
-    if (
-      fechaDia.getDate() === hoy.getDate() &&
-      fechaDia.getMonth() === hoy.getMonth() &&
-      fechaDia.getFullYear() === hoy.getFullYear()
-    ) {
-      clases.push('dia-hoy');
-    }
-    
     return clases.join(' ');
+  };
+
+  const getDiasDelMes = () => {
+    const anio = fechaActual.getFullYear();
+    const mes = fechaActual.getMonth();
+    
+    const primerDia = new Date(anio, mes, 1);
+    const ultimoDia = new Date(anio, mes + 1, 0);
+    
+    const diasVaciosInicio = primerDia.getDay();
+    const totalDias = ultimoDia.getDate();
+    
+    const dias = [];
+    
+    for (let i = 0; i < diasVaciosInicio; i++) {
+      dias.push({ vacio: true, key: `vacio-${i}` });
+    }
+    
+    for (let dia = 1; dia <= totalDias; dia++) {
+      const diaData = calendario?.dias?.find(d => {
+        const fecha = new Date(d.fecha);
+        return fecha.getDate() === dia;
+      });
+      
+      dias.push({
+        numero: dia,
+        key: `dia-${dia}`,
+        colorCustodia: diaData?.colorCustodia || null
+      });
+    }
+    
+    return dias;
   };
 
   const nombresMeses = [
@@ -91,81 +106,100 @@ const Calendario = () => {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  const diasSemana = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+  const diasSemana = ['S', 'L', 'M', 'M', 'J', 'V', 'S'];
 
   if (loading) {
     return (
-      <div className="calendario-container">
-        <div className="loading">Cargando calendario...</div>
+      <div className="calendario-page">
+        <div className="loading">Cargando...</div>
       </div>
     );
   }
 
   return (
-    <div className="calendario-container">
-      <header className="calendario-header">
-        <button className="btn-back" onClick={() => navigate('/home')}>
-          ← Volver
-        </button>
-        <h1>{hijo?.nombre} {hijo?.apellido}</h1>
-      </header>
+    <div className="calendario-page">
+      <div className="calendario-container">
+        <div className="calendario-header">
+          <div className="logo-calendario">
+            <h1>We<br/>Parent</h1>
+          </div>
+          <button className="btn-notification-cal">
+            🔔
+          </button>
+        </div>
 
-      <div className="mes-navegacion">
-        <button className="btn-mes" onClick={mesAnterior}>←</button>
-        <h2 className="mes-titulo">
-          {nombresMeses[fechaActual.getMonth()]} {fechaActual.getFullYear()}
-        </h2>
-        <button className="btn-mes" onClick={mesSiguiente}>→</button>
-      </div>
+        <div className="color-selector">
+          <p className="color-label">Tu color:</p>
+          <div className="color-opciones">
+            <button
+              className={`color-btn ${colorSeleccionado === 'lila' ? 'active' : ''}`}
+              onClick={() => setColorSeleccionado('lila')}
+              style={{ backgroundColor: '#d8b4fe' }}
+            >
+              {colorSeleccionado === 'lila' && '✓'}
+            </button>
+            <button
+              className={`color-btn ${colorSeleccionado === 'celeste' ? 'active' : ''}`}
+              onClick={() => setColorSeleccionado('celeste')}
+              style={{ backgroundColor: '#7dd3fc' }}
+            >
+              {colorSeleccionado === 'celeste' && '✓'}
+            </button>
+          </div>
+        </div>
 
-      <div className="calendario-grid">
-        {diasSemana.map(dia => (
-          <div key={dia} className="dia-semana">{dia}</div>
-        ))}
-        
-        {calendario?.dias?.map((dia, index) => {
-          const fecha = new Date(dia.fecha);
-          const primerDia = index === 0;
-          const diaSemana = fecha.getDay();
+        <div className="calendario-card">
+          <div className="mes-navegacion">
+            <button className="btn-nav" onClick={mesAnterior}>
+              <span>&lt;</span>
+            </button>
+            <h2 className="mes-titulo">
+              {nombresMeses[fechaActual.getMonth()]} {fechaActual.getFullYear()}
+            </h2>
+            <button className="btn-nav" onClick={mesSiguiente}>
+              <span>&gt;</span>
+            </button>
+          </div>
+
+          <div className="calendario-grid">
+            <div className="dias-semana-row">
+              {diasSemana.map(dia => (
+                <div key={dia} className="dia-semana-header">{dia}</div>
+              ))}
+            </div>
+            
+            <div className="dias-grid">
+              {getDiasDelMes().map(dia => (
+                dia.vacio ? (
+                  <div key={dia.key} className="dia-celda vacio"></div>
+                ) : (
+                  <div 
+                    key={dia.key} 
+                    className={`dia-celda ${dia.colorCustodia ? `custodia-${dia.colorCustodia.toLowerCase()}` : ''}`}
+                  >
+                    <span className="dia-numero">{dia.numero}</span>
+                  </div>
+                )
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="acciones-calendario">
+          <button className="accion-btn" onClick={() => navigate('/establecer-custodia')}>
+            <span className="accion-icon">📅</span>
+            <span className="accion-texto">Establecer fechas<br/>de Custodia</span>
+          </button>
           
-          return (
-            <React.Fragment key={dia.fecha}>
-              {primerDia && diaSemana > 0 && 
-                Array.from({ length: diaSemana }).map((_, i) => (
-                  <div key={`empty-${i}`} className="dia-celda vacio"></div>
-                ))
-              }
-              <div className={getDiaClase(dia)}>
-                <div className="dia-numero">{fecha.getDate()}</div>
-                {dia.cantidadActividades > 0 && (
-                  <div className="actividad-badge">{dia.cantidadActividades}</div>
-                )}
-                {dia.tieneCambioSolicitado && (
-                  <div className="solicitud-badge">!</div>
-                )}
-              </div>
-            </React.Fragment>
-          );
-        })}
-      </div>
+          <button className="accion-btn" onClick={() => navigate('/solicitar-cambio')}>
+            <span className="accion-icon">🔄</span>
+            <span className="accion-texto">Solicitar cambio</span>
+          </button>
+        </div>
 
-      <div className="leyenda">
-        <div className="leyenda-item">
-          <div className="leyenda-color custodia-lila"></div>
-          <span>Custodia Padre 1</span>
-        </div>
-        <div className="leyenda-item">
-          <div className="leyenda-color custodia-celeste"></div>
-          <span>Custodia Padre 2</span>
-        </div>
-        <div className="leyenda-item">
-          <div className="leyenda-badge">3</div>
-          <span>Actividades</span>
-        </div>
-        <div className="leyenda-item">
-          <div className="leyenda-badge-solicitud">!</div>
-          <span>Cambio solicitado</span>
-        </div>
+        <button className="btn-volver" onClick={() => navigate('/home-hijo')}>
+          Volver
+        </button>
       </div>
     </div>
   );
