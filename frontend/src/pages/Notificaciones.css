@@ -9,7 +9,7 @@
   padding: 20px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
 }
@@ -19,6 +19,21 @@
   font-weight: 600;
   color: #2d2d2d;
   margin: 0;
+}
+
+.btn-notificaciones-icon {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.notificaciones-titulo {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0 0 20px 0;
 }
 
 .notificaciones-content {
@@ -95,4 +110,30 @@
   text-align: center;
   padding: 60px 20px;
   color: #666;
+}
+
+.btn-back {
+  background: white;
+  border: 2px solid #ff9b71;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #ff9b71;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  max-width: 360px;
+  margin-top: 24px;
+}
+
+.btn-back:hover {
+  background: #f5f0e8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 155, 113, 0.2);
+}
+
+.btn-back:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

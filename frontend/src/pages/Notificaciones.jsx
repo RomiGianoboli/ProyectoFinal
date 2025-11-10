@@ -85,13 +85,15 @@ const Notificaciones = () => {
   return (
     <div className="notificaciones-container">
       <header className="notificaciones-header">
-        <button className="btn-back" onClick={() => navigate('/home')}>
-          ← Volver
+        <h1>We Parent</h1>
+        <button className="btn-notificaciones-icon">
+          🔔
         </button>
-        <h1>Notificaciones</h1>
       </header>
 
       <div className="notificaciones-content">
+        <h2 className="notificaciones-titulo">Notificaciones</h2>
+        
         {loading ? (
           <div className="loading">Cargando...</div>
         ) : notificaciones.length === 0 ? (
@@ -121,6 +123,10 @@ const Notificaciones = () => {
             ))}
           </div>
         )}
+
+        <button className="btn-back" onClick={() => navigate('/home')}>
+          Volver
+        </button>
       </div>
     </div>
   );
