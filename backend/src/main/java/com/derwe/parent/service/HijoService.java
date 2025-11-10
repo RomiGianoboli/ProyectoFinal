@@ -40,7 +40,7 @@ public class HijoService {
         relacion.setPadre(padre);
         relacion.setHijo(hijoGuardado);
         relacion.setEsPadreCreador(true);
-        relacion.setColorAsignado("LILA"); // Padre creador siempre tiene color LILA
+        relacion.setColorAsignado(null); // Color NULL hasta que el padre lo seleccione en el calendario
         
         relacionRepository.save(relacion);
         
@@ -63,7 +63,7 @@ public class HijoService {
         relacion.setPadre(coPadre);
         relacion.setHijo(hijo);
         relacion.setEsPadreCreador(false);
-        relacion.setColorAsignado("CELESTE"); // Co-padre siempre tiene color CELESTE
+        relacion.setColorAsignado(null); // Color NULL hasta que el co-padre lo seleccione en el calendario
         
         relacionRepository.save(relacion);
     }
