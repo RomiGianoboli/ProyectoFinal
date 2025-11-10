@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { calendarioAPI, hijoAPI } from '../services/api';
+import { calendarioAPI, hijoAPI, notificacionAPI, solicitudAPI } from '../services/api';
 import './Calendario.css';
 
 const Calendario = () => {
@@ -14,6 +14,8 @@ const Calendario = () => {
   const [loading, setLoading] = useState(true);
   const [colorSeleccionado, setColorSeleccionado] = useState(null);
   const [guardandoColor, setGuardandoColor] = useState(false);
+  const [notificacionesCount, setNotificacionesCount] = useState(0);
+  const [solicitudesPendientes, setSolicitudesPendientes] = useState([]);
 
   useEffect(() => {
     const hijoGuardado = localStorage.getItem('hijoSeleccionado');
@@ -34,6 +36,8 @@ const Calendario = () => {
   useEffect(() => {
     if (hijo) {
       cargarCalendario();
+      cargarNotificaciones();
+      cargarSolicitudesPendientes();
     }
   }, [fechaActual, hijo]);
 
@@ -48,6 +52,25 @@ const Calendario = () => {
       console.error('Error al cargar calendario:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const cargarNotificaciones = async () => {
+    try {
+      const response = await notificacionAPI.contadorNoLeidas();
+      setNotificacionesCount(response.data);
+    } catch (error) {
+      console.error('Error al cargar notificaciones:', error);
+    }
+  };
+
+  const cargarSolicitudesPendientes = async () => {
+    try {
+      const response = await solicitudAPI.recibidas();
+      const pendientes = response.data.filter(s => s.estado === 'PENDIENTE');
+      setSolicitudesPendientes(pendientes);
+    } catch (error) {
+      console.error('Error al cargar solicitudes:', error);
     }
   };
 
@@ -165,8 +188,31 @@ const Calendario = () => {
           <div className="logo-calendario">
             <h1>We<br/>Parent</h1>
           </div>
-          <button className="btn-notification-cal">
+          <button 
+            className="btn-notification-cal" 
+            onClick={() => navigate('/notificaciones')}
+            style={{ position: 'relative' }}
+          >
             🔔
+            {notificacionesCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-4px',
+                background: '#ff4444',
+                color: 'white',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                fontSize: '12px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 'bold'
+              }}>
+                {notificacionesCount}
+              </span>
+            )}
           </button>
         </div>
 
@@ -252,12 +298,12 @@ const Calendario = () => {
         </div>
 
         <div className="acciones-calendario">
-          <button className="accion-btn" onClick={() => navigate('/establecer-custodia')}>
+          <button className="accion-btn" onClick={() => navigate('/establecer-custodia', { state: { hijo } })}>
             <span className="accion-icon">📅</span>
             <span className="accion-texto">Establecer fechas<br/>de Custodia</span>
           </button>
           
-          <button className="accion-btn" onClick={() => navigate('/solicitar-cambio')}>
+          <button className="accion-btn" onClick={() => navigate('/solicitar-cambio', { state: { hijo } })}>
             <span className="accion-icon">🔄</span>
             <span className="accion-texto">Solicitar cambio</span>
           </button>

@@ -34,6 +34,16 @@ const Notificaciones = () => {
     }
   };
 
+  const handleNotificacionClick = async (notif) => {
+    if (!notif.leida) {
+      await marcarLeida(notif.id);
+    }
+
+    if (notif.tipo === 'SOLICITUD_CAMBIO_CUSTODIA' && notif.referenciaId) {
+      navigate(`/aprobar-rechazar-cambio?id=${notif.referenciaId}`);
+    }
+  };
+
   const getTipoIcono = (tipo) => {
     switch (tipo) {
       case 'ACTIVIDAD_CREADA':
@@ -94,7 +104,8 @@ const Notificaciones = () => {
               <div
                 key={notif.id}
                 className={`notificacion-card ${!notif.leida ? 'no-leida' : ''}`}
-                onClick={() => !notif.leida && marcarLeida(notif.id)}
+                onClick={() => handleNotificacionClick(notif)}
+                style={{ cursor: 'pointer' }}
               >
                 <div className="notificacion-icono">
                   {getTipoIcono(notif.tipo)}

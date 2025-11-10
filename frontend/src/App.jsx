@@ -16,6 +16,9 @@ import EliminarActividad from './pages/EliminarActividad';
 import SeleccionDia from './pages/SeleccionDia';
 import Notificaciones from './pages/Notificaciones';
 import Custodias from './pages/Custodias';
+import EstablecerCustodia from './pages/EstablecerCustodia';
+import SolicitarCambio from './pages/SolicitarCambio';
+import AprobarRechazarCambio from './pages/AprobarRechazarCambio';
 import './App.css';
 
 const PrivateRoute = ({ children }) => {
@@ -132,6 +135,30 @@ function App() {
             element={
               <PrivateRoute>
                 <Custodias />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/establecer-custodia" 
+            element={
+              <PrivateRoute>
+                <EstablecerCustodia />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/solicitar-cambio" 
+            element={
+              <PrivateRoute>
+                <SolicitarCambio />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/aprobar-rechazar-cambio" 
+            element={
+              <PrivateRoute>
+                <AprobarRechazarCambio />
               </PrivateRoute>
             } 
           />

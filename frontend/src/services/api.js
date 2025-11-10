@@ -57,6 +57,7 @@ export const actividadAPI = {
 
 export const custodiaAPI = {
   establecer: (data) => api.post('/custodias', data),
+  porHijo: (hijoId) => api.get(`/custodias/hijo/${hijoId}`),
   porMes: (hijoId, anio, mes) => api.get(`/custodias/hijo/${hijoId}/mes/${anio}/${mes}`),
 };
 
@@ -65,9 +66,10 @@ export const calendarioAPI = {
 };
 
 export const notificacionAPI = {
-  misNotificaciones: () => api.get('/notificaciones/mis-notificaciones'),
+  misNotificaciones: () => api.get('/notificaciones'),
+  noLeidas: () => api.get('/notificaciones/no-leidas'),
   marcarLeida: (id) => api.post(`/notificaciones/${id}/leer`),
-  contadorNoLeidas: () => api.get('/notificaciones/no-leidas/count'),
+  contadorNoLeidas: () => api.get('/notificaciones/contador'),
 };
 
 export const invitacionAPI = {
@@ -81,7 +83,9 @@ export const solicitudAPI = {
   crear: (data) => api.post('/solicitudes-cambio', data),
   aprobar: (id) => api.post(`/solicitudes-cambio/${id}/aprobar`),
   rechazar: (id) => api.post(`/solicitudes-cambio/${id}/rechazar`),
-  pendientes: () => api.get('/solicitudes-cambio/pendientes'),
+  enviadas: () => api.get('/solicitudes-cambio/enviadas'),
+  recibidas: () => api.get('/solicitudes-cambio/recibidas'),
+  porHijo: (hijoId) => api.get(`/solicitudes-cambio/hijo/${hijoId}`),
 };
 
 export default api;
