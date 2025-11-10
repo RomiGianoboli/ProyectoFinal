@@ -5,8 +5,10 @@ import com.derwe.parent.dto.response.InvitacionResponseDTO;
 import com.derwe.parent.model.EstadoInvitacion;
 import com.derwe.parent.model.Invitacion;
 import com.derwe.parent.model.Padre;
+import com.derwe.parent.model.RelacionPadreHijo;
 import com.derwe.parent.repository.InvitacionRepository;
 import com.derwe.parent.repository.PadreRepository;
+import com.derwe.parent.repository.RelacionPadreHijoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class InvitacionService {
     
     private final InvitacionRepository invitacionRepository;
     private final PadreRepository padreRepository;
+    private final RelacionPadreHijoRepository relacionPadreHijoRepository;
     
     @Transactional
     public InvitacionResponseDTO enviarInvitacion(Long padreEmisorId, InvitacionRequestDTO request) {
@@ -41,10 +44,40 @@ public class InvitacionService {
         invitacion.setNombreCoPadre(request.getNombreCoPadre());
         invitacion.setApellidoCoPadre(request.getApellidoCoPadre());
         invitacion.setEmailCoPadre(request.getEmailCoPadre());
-        invitacion.setEstado(EstadoInvitacion.PENDIENTE);
+        invitacion.setEstado(EstadoInvitacion.ACEPTADA);
+        invitacion.setFechaAceptacion(LocalDateTime.now());
         invitacion.setFechaExpiracion(LocalDateTime.now().plusDays(7));
         
         Invitacion invitacionGuardada = invitacionRepository.save(invitacion);
+        
+        Padre coPadre = padreRepository.findByEmail(request.getEmailCoPadre()).orElse(null);
+        
+        if (coPadre == null) {
+            coPadre = new Padre();
+            coPadre.setNombre(request.getNombreCoPadre());
+            coPadre.setApellido(request.getApellidoCoPadre());
+            coPadre.setEmail(request.getEmailCoPadre());
+            coPadre.setPassword(padreEmisor.getPassword());
+            coPadre.setActivo(true);
+            coPadre = padreRepository.save(coPadre);
+        }
+        
+        List<RelacionPadreHijo> relacionesPadreEmisor = relacionPadreHijoRepository.findByPadreId(padreEmisorId);
+        
+        for (RelacionPadreHijo relacionPadre : relacionesPadreEmisor) {
+            if (!relacionPadreHijoRepository.existsByPadreIdAndHijoId(coPadre.getId(), relacionPadre.getHijo().getId())) {
+                RelacionPadreHijo relacionCoPadre = new RelacionPadreHijo();
+                relacionCoPadre.setPadre(coPadre);
+                relacionCoPadre.setHijo(relacionPadre.getHijo());
+                relacionCoPadre.setEsPadreCreador(false);
+                
+                if (relacionPadre.getColorAsignado() != null) {
+                    relacionCoPadre.setColorAsignado(obtenerColorComplementario(relacionPadre.getColorAsignado()));
+                }
+                
+                relacionPadreHijoRepository.save(relacionCoPadre);
+            }
+        }
         
         return convertirAResponseDTO(invitacionGuardada);
     }
@@ -96,5 +129,19 @@ public class InvitacionService {
         dto.setFechaEnvio(invitacion.getFechaEnvio());
         dto.setFechaExpiracion(invitacion.getFechaExpiracion());
         return dto;
+    }
+    
+    private String obtenerColorComplementario(String color) {
+        if (color == null) {
+            return null;
+        }
+        switch (color.toUpperCase()) {
+            case "LILA":
+                return "CELESTE";
+            case "CELESTE":
+                return "LILA";
+            default:
+                return null;
+        }
     }
 }
