@@ -91,7 +91,7 @@ const HomeHijoSeleccionado = () => {
               className="btn-cambiar-hijo" 
               onClick={handleVolver}
             >
-              ← Cambiar hijo
+              Cambiar hijo
             </button>
           </div>
         </div>
