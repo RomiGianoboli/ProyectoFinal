@@ -209,20 +209,21 @@
 
 .btn-volver-sel {
   background: white;
-  border: 2px solid #e5e7eb;
-  padding: 12px 24px;
-  border-radius: 25px;
-  font-size: 14px;
+  border: 2px solid #ff9b71;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 16px;
   font-weight: 500;
-  color: #6b7280;
+  color: #2c3e50;
   cursor: pointer;
   width: 100%;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .btn-volver-sel:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: #fff5f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 155, 113, 0.2);
 }
 
 /* Formularios */
