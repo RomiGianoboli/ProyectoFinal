@@ -3,17 +3,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f0e8 0%, #fdf8f3 100%);
-  padding: 20px;
+  background: #f5f0e8;
+  padding: 0;
 }
 
 .login-card {
-  background: #F7F0E7;
-  border-radius: 16px;
+  background: #f5f0e8;
+  border-radius: 0;
   padding: 48px 40px;
-  border: 3px solid #7dd3fc;
-  max-width: 400px;
+  border: none;
+  max-width: 450px;
   width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .logo {
@@ -22,9 +26,9 @@
 }
 
 .logo h1 {
-  font-size: 32px;
-  font-weight: 600;
-  color: #2d2d2d;
+  font-size: 28px;
+  font-weight: 700;
+  color: #000000;
   margin: 0;
   line-height: 1.2;
 }
