@@ -54,7 +54,11 @@ const AgregarActividad = () => {
   };
 
   const handleCancelar = () => {
-    navigate('/seleccion-dia', { state: { fecha, hijo, mesAnio } });
+    if (fecha && hijo) {
+      navigate('/seleccion-dia', { state: { fecha, hijo, mesAnio } });
+    } else {
+      navigate('/calendario', { state: { hijo } });
+    }
   };
 
   if (!hijo) {

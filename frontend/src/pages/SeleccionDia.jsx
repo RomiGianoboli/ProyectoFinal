@@ -64,7 +64,24 @@ const SeleccionDia = () => {
           </button>
         </div>
 
-        <p className="tu-color-label">Tu color: [ver como hacer seleccion de color]</p>
+        {hijo?.colorPadre && (
+          <p className="tu-color-label">
+            Tu color: 
+            <span 
+              className="color-badge-inline" 
+              style={{ 
+                backgroundColor: hijo.colorPadre === 'LILA' ? '#d8b4fe' : '#7dd3fc',
+                marginLeft: '8px',
+                padding: '2px 12px',
+                borderRadius: '12px',
+                color: '#1f2937',
+                fontWeight: '600'
+              }}
+            >
+              {hijo.colorPadre}
+            </span>
+          </p>
+        )}
 
         <div className="calendario-preview-card">
           <div className="mes-titulo-preview">{mesAnio || 'Noviembre 2025'}</div>
@@ -128,7 +145,7 @@ const SeleccionDia = () => {
           </div>
         </div>
 
-        <button className="btn-volver-sel" onClick={() => navigate('/calendario')}>
+        <button className="btn-volver-sel" onClick={() => navigate('/calendario', { state: { hijo } })}>
           Volver
         </button>
       </div>
