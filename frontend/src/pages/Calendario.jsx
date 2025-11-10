@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { calendarioAPI } from '../services/api';
+import { calendarioAPI, hijoAPI } from '../services/api';
 import './Calendario.css';
 
 const Calendario = () => {
@@ -12,15 +12,19 @@ const Calendario = () => {
   const [fechaActual, setFechaActual] = useState(new Date());
   const [calendario, setCalendario] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [colorSeleccionado, setColorSeleccionado] = useState('lila');
+  const [colorSeleccionado, setColorSeleccionado] = useState(null);
+  const [guardandoColor, setGuardandoColor] = useState(false);
 
   useEffect(() => {
     const hijoGuardado = localStorage.getItem('hijoSeleccionado');
     if (hijoFromState) {
       setHijo(hijoFromState);
+      setColorSeleccionado(hijoFromState.colorPadre);
       localStorage.setItem('hijoSeleccionado', JSON.stringify(hijoFromState));
     } else if (hijoGuardado) {
-      setHijo(JSON.parse(hijoGuardado));
+      const hijo = JSON.parse(hijoGuardado);
+      setHijo(hijo);
+      setColorSeleccionado(hijo.colorPadre);
     } else {
       navigate('/lista-hijos');
       return;
@@ -67,6 +71,44 @@ const Calendario = () => {
     }
     
     return clases.join(' ');
+  };
+
+  const seleccionarColor = async (color) => {
+    if (hijo.colorPadre !== null) {
+      alert('El color ya fue seleccionado y no se puede cambiar');
+      return;
+    }
+    
+    setGuardandoColor(true);
+    const colorOriginal = colorSeleccionado;
+    const colorEnMayusculas = color.toUpperCase();
+    setColorSeleccionado(colorEnMayusculas); // UI optimista en uppercase
+    
+    try {
+      await hijoAPI.seleccionarColor(hijo.id, colorEnMayusculas);
+      
+      // Actualizar hijo con el nuevo color
+      const hijoActualizado = { ...hijo, colorPadre: colorEnMayusculas };
+      setHijo(hijoActualizado);
+      localStorage.setItem('hijoSeleccionado', JSON.stringify(hijoActualizado));
+    } catch (error) {
+      console.error('Error al seleccionar color:', error);
+      setColorSeleccionado(colorOriginal); // Rollback
+      alert(error.response?.data?.message || 'Error al guardar color');
+    } finally {
+      setGuardandoColor(false);
+    }
+  };
+
+  const handleDiaClick = (dia) => {
+    if (!dia.vacio && dia.numero) {
+      const anio = fechaActual.getFullYear();
+      const mes = fechaActual.getMonth() + 1;
+      const fecha = `${anio}-${mes.toString().padStart(2, '0')}-${dia.numero.toString().padStart(2, '0')}`;
+      const mesAnio = `${nombresMeses[fechaActual.getMonth()]} ${fechaActual.getFullYear()}`;
+      
+      navigate('/seleccion-dia', { state: { fecha, hijo, mesAnio } });
+    }
   };
 
   const getDiasDelMes = () => {
@@ -128,25 +170,41 @@ const Calendario = () => {
           </button>
         </div>
 
-        <div className="color-selector">
-          <p className="color-label">Tu color:</p>
-          <div className="color-opciones">
-            <button
-              className={`color-btn ${colorSeleccionado === 'lila' ? 'active' : ''}`}
-              onClick={() => setColorSeleccionado('lila')}
-              style={{ backgroundColor: '#d8b4fe' }}
-            >
-              {colorSeleccionado === 'lila' && '✓'}
-            </button>
-            <button
-              className={`color-btn ${colorSeleccionado === 'celeste' ? 'active' : ''}`}
-              onClick={() => setColorSeleccionado('celeste')}
-              style={{ backgroundColor: '#7dd3fc' }}
-            >
-              {colorSeleccionado === 'celeste' && '✓'}
-            </button>
+        {colorSeleccionado ? (
+          <div className="color-mostrar">
+            <p className="color-label">Tu color: 
+              <span 
+                className="color-badge" 
+                style={{ backgroundColor: colorSeleccionado === 'LILA' ? '#d8b4fe' : '#7dd3fc' }}
+              >
+                {colorSeleccionado}
+              </span>
+            </p>
           </div>
-        </div>
+        ) : (
+          <div className="color-selector">
+            <p className="color-label">Tu color:</p>
+            <div className="color-opciones">
+              <button
+                className="color-btn"
+                onClick={() => seleccionarColor('lila')}
+                style={{ backgroundColor: '#d8b4fe' }}
+                disabled={guardandoColor}
+              >
+                Lila
+              </button>
+              <button
+                className="color-btn"
+                onClick={() => seleccionarColor('celeste')}
+                style={{ backgroundColor: '#7dd3fc' }}
+                disabled={guardandoColor}
+              >
+                Celeste
+              </button>
+            </div>
+            {guardandoColor && <p className="guardando-texto">Guardando...</p>}
+          </div>
+        )}
 
         <div className="calendario-card">
           <div className="mes-navegacion">
@@ -176,6 +234,8 @@ const Calendario = () => {
                   <div 
                     key={dia.key} 
                     className={`dia-celda ${dia.colorCustodia ? `custodia-${dia.colorCustodia.toLowerCase()}` : ''}`}
+                    onClick={() => handleDiaClick(dia)}
+                    style={{ cursor: 'pointer' }}
                   >
                     <span className="dia-numero">{dia.numero}</span>
                   </div>

@@ -12,6 +12,8 @@ import Invitacion from './pages/Invitacion';
 import Actividades from './pages/Actividades';
 import AgregarActividad from './pages/AgregarActividad';
 import EditarActividad from './pages/EditarActividad';
+import EliminarActividad from './pages/EliminarActividad';
+import SeleccionDia from './pages/SeleccionDia';
 import Notificaciones from './pages/Notificaciones';
 import Custodias from './pages/Custodias';
 import './App.css';
@@ -98,6 +100,22 @@ function App() {
             element={
               <PrivateRoute>
                 <EditarActividad />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/eliminar-actividad" 
+            element={
+              <PrivateRoute>
+                <EliminarActividad />
+              </PrivateRoute>
+            } 
+          />
+          <Route 
+            path="/seleccion-dia" 
+            element={
+              <PrivateRoute>
+                <SeleccionDia />
               </PrivateRoute>
             } 
           />

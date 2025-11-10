@@ -44,6 +44,7 @@ export const hijoAPI = {
   crear: (data) => api.post('/hijos', data),
   misHijos: () => api.get('/hijos'),
   vincular: (data) => api.post('/hijos/vincular', data),
+  seleccionarColor: (hijoId, color) => api.put(`/hijos/${hijoId}/seleccionar-color`, { color }),
 };
 
 export const actividadAPI = {

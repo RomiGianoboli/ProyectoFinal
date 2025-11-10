@@ -1,0 +1,402 @@
+/* SeleccionDia.css - Estilos para pantallas de actividades según Figma */
+
+.seleccion-dia-page {
+  min-height: 100vh;
+  background: #f5f0e8;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.seleccion-dia-container {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.seleccion-dia-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.logo-seleccion h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ff9b71;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.btn-notification-sel {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.tu-color-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.calendario-preview-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.mes-titulo-preview {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.calendario-mini {
+  margin-bottom: 20px;
+}
+
+.dias-semana-mini {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.dia-semana-mini {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.dias-grid-mini {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dia-mini {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #4b5563;
+  border-radius: 4px;
+  background: #f9fafb;
+}
+
+.dia-mini.selected {
+  background: #ff9b71;
+  color: white;
+  font-weight: 600;
+}
+
+.dia-mini-small {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #9ca3af;
+  background: #f9fafb;
+  border-radius: 3px;
+}
+
+.actividades-lista {
+  background: #fef3c7;
+  border-radius: 12px;
+  padding: 15px;
+  min-height: 100px;
+  margin-bottom: 15px;
+}
+
+.no-actividades {
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  padding: 20px;
+}
+
+.actividad-item {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.actividad-item:last-child {
+  margin-bottom: 0;
+}
+
+.actividad-circulo {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.actividad-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.actividad-detalles {
+  flex: 1;
+}
+
+.actividad-nombre {
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+
+.actividad-horario {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.actividades-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.accion-actividad-btn {
+  background: none;
+  border: none;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+  color: #1f2937;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.accion-actividad-btn:hover {
+  background: #f3f4f6;
+}
+
+.icono-accion {
+  font-size: 16px;
+}
+
+.btn-volver-sel {
+  background: white;
+  border: 2px solid #e5e7eb;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.btn-volver-sel:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* Formularios */
+.formulario-card {
+  position: relative;
+}
+
+.formulario-actividad {
+  margin-bottom: 20px;
+}
+
+.form-group-act {
+  margin-bottom: 15px;
+}
+
+.form-group-act label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.input-act {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.input-act:focus {
+  outline: none;
+  border-color: #ff9b71;
+}
+
+.input-time {
+  font-family: monospace;
+}
+
+.horario-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.botones-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-cancelar {
+  flex: 1;
+  padding: 12px 24px;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancelar:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.btn-guardar {
+  flex: 1;
+  padding: 12px 24px;
+  background: #ff9b71;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-guardar:hover:not(:disabled) {
+  background: #ff8a5a;
+}
+
+.btn-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message-act {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+/* Confirmación de eliminación */
+.confirmacion-card {
+  text-align: center;
+}
+
+.confirmacion-contenido {
+  margin-bottom: 20px;
+}
+
+.confirmacion-titulo {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 20px 0;
+}
+
+.actividad-detalles-eliminar {
+  background: #fef3c7;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.actividad-nombre-eliminar {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+}
+
+.actividad-horario-eliminar {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.botones-confirmacion {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-eliminar {
+  flex: 1;
+  padding: 12px 24px;
+  background: #ef4444;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-eliminar:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn-eliminar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .seleccion-dia-page {
+    padding: 15px;
+  }
+  
+  .calendario-preview-card {
+    padding: 15px;
+  }
+  
+  .horario-row {
+    grid-template-columns: 1fr;
+  }
+}
