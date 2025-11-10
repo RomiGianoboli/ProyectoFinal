@@ -2,6 +2,7 @@ package com.derwe.parent.service;
 
 import com.derwe.parent.dto.request.HijoRequestDTO;
 import com.derwe.parent.dto.response.HijoResponseDTO;
+import com.derwe.parent.dto.response.SeleccionColorResponseDTO;
 import com.derwe.parent.model.Hijo;
 import com.derwe.parent.model.Padre;
 import com.derwe.parent.model.RelacionPadreHijo;
@@ -39,7 +40,7 @@ public class HijoService {
         relacion.setPadre(padre);
         relacion.setHijo(hijoGuardado);
         relacion.setEsPadreCreador(true);
-        relacion.setColorAsignado("LILA");
+        relacion.setColorAsignado(null); // Color NULL hasta que el padre lo seleccione
         
         relacionRepository.save(relacion);
         
@@ -58,13 +59,11 @@ public class HijoService {
             throw new RuntimeException("El co-padre ya está vinculado con este hijo");
         }
         
-        String colorDisponible = determinarColorDisponible(hijoId);
-        
         RelacionPadreHijo relacion = new RelacionPadreHijo();
         relacion.setPadre(coPadre);
         relacion.setHijo(hijo);
         relacion.setEsPadreCreador(false);
-        relacion.setColorAsignado(colorDisponible);
+        relacion.setColorAsignado(null); // Color NULL hasta que el co-padre seleccione
         
         relacionRepository.save(relacion);
     }
@@ -86,6 +85,45 @@ public class HijoService {
         }
         
         return convertirAResponseDTO(hijo, padreId);
+    }
+    
+    @Transactional
+    public SeleccionColorResponseDTO seleccionarColor(Long hijoId, Long padreId, String colorElegido) {
+        // Verificar que la relación existe
+        RelacionPadreHijo relacionPadre = relacionRepository.findByPadreIdAndHijoId(padreId, hijoId)
+                .orElseThrow(() -> new RuntimeException("No tienes acceso a este hijo"));
+        
+        // Verificar que el color aún no ha sido seleccionado (no se puede cambiar)
+        if (relacionPadre.getColorAsignado() != null) {
+            throw new RuntimeException("El color ya fue seleccionado y no se puede cambiar");
+        }
+        
+        // Asignar el color elegido al padre
+        relacionPadre.setColorAsignado(colorElegido);
+        relacionRepository.save(relacionPadre);
+        
+        // Determinar el color opuesto
+        String colorOpuesto = "LILA".equals(colorElegido) ? "CELESTE" : "LILA";
+        
+        // Buscar al co-padre y asignarle el color opuesto automáticamente
+        List<RelacionPadreHijo> todasRelaciones = relacionRepository.findByHijoId(hijoId);
+        String colorCoPadre = null;
+        
+        for (RelacionPadreHijo relacion : todasRelaciones) {
+            if (!relacion.getPadre().getId().equals(padreId)) {
+                // Este es el co-padre, asignarle el color opuesto
+                relacion.setColorAsignado(colorOpuesto);
+                relacionRepository.save(relacion);
+                colorCoPadre = colorOpuesto;
+                break;
+            }
+        }
+        
+        return new SeleccionColorResponseDTO(
+                colorElegido,
+                colorCoPadre,
+                "Color seleccionado exitosamente"
+        );
     }
     
     private String determinarColorDisponible(Long hijoId) {

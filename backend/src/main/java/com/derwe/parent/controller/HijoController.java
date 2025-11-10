@@ -1,7 +1,9 @@
 package com.derwe.parent.controller;
 
 import com.derwe.parent.dto.request.HijoRequestDTO;
+import com.derwe.parent.dto.request.SeleccionColorRequestDTO;
 import com.derwe.parent.dto.response.HijoResponseDTO;
+import com.derwe.parent.dto.response.SeleccionColorResponseDTO;
 import com.derwe.parent.model.Padre;
 import com.derwe.parent.repository.PadreRepository;
 import com.derwe.parent.service.HijoService;
@@ -63,5 +65,15 @@ public class HijoController {
         Long padreId = obtenerPadreIdDesdeAutenticacion(authentication);
         HijoResponseDTO hijo = hijoService.obtenerHijoPorId(hijoId, padreId);
         return ResponseEntity.ok(hijo);
+    }
+    
+    @PutMapping("/{hijoId}/seleccionar-color")
+    public ResponseEntity<SeleccionColorResponseDTO> seleccionarColor(
+            @PathVariable Long hijoId,
+            @Valid @RequestBody SeleccionColorRequestDTO request,
+            Authentication authentication) {
+        Long padreId = obtenerPadreIdDesdeAutenticacion(authentication);
+        SeleccionColorResponseDTO response = hijoService.seleccionarColor(hijoId, padreId, request.getColor());
+        return ResponseEntity.ok(response);
     }
 }

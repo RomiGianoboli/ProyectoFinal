@@ -29,10 +29,8 @@ public class RelacionPadreHijo {
     @JoinColumn(name = "hijo_id", nullable = false)
     private Hijo hijo;
     
-    @NotBlank(message = "El color asignado es obligatorio")
-    @Pattern(regexp = "^(LILA|CELESTE)$", message = "El color debe ser LILA o CELESTE")
-    @Column(nullable = false, length = 10)
-    private String colorAsignado; // LILA o CELESTE
+    @Column(length = 10)
+    private String colorAsignado; // LILA o CELESTE - NULL hasta que el padre lo seleccione
     
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
