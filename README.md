@@ -1,8 +1,7 @@
 # WeParent - Sistema de Coordinación Parental
 
-![Logo DerWeParent](frontend/public/logo.png)
 
-DerWeParent ("We Parent") es una Progressive Web Application (PWA) diseñada para facilitar la coordinación entre co-padres en el cuidado de sus hijos. La aplicación permite gestionar calendarios de custodia, actividades compartidas, y mantener una comunicación organizada.
+WeParent es una app diseñada para facilitar la coordinación entre co-padres en el cuidado de sus hijos. La aplicación permite gestionar calendarios de custodia, actividades compartidas, y mantener una comunicación organizada.
 
 **Trabajo Final de Grado (TFG)** - Ingeniería en Software  
 **Universidad:** Universidad Siglo 21  
