@@ -171,16 +171,22 @@ const Calendario = () => {
         </div>
 
         {colorSeleccionado ? (
-          <div className="color-mostrar">
-            <p className="color-label">Tu color: 
-              <span 
-                className="color-badge" 
-                style={{ backgroundColor: colorSeleccionado === 'LILA' ? '#d8b4fe' : '#7dd3fc' }}
-              >
-                {colorSeleccionado}
-              </span>
-            </p>
-          </div>
+          <p className="tu-color-label">
+            Tu color: 
+            <span 
+              className="color-badge-inline" 
+              style={{ 
+                backgroundColor: colorSeleccionado === 'LILA' ? '#d8b4fe' : '#7dd3fc',
+                marginLeft: '8px',
+                padding: '2px 12px',
+                borderRadius: '12px',
+                color: '#1f2937',
+                fontWeight: '600'
+              }}
+            >
+              {colorSeleccionado}
+            </span>
+          </p>
         ) : (
           <div className="color-selector">
             <p className="color-label">Tu color:</p>
