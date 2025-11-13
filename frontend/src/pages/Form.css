@@ -103,9 +103,9 @@
 .btn-back {
   background: transparent;
   border: none;
-  padding: 8px 12px;
-  font-size: 15px;
-  font-weight: 500;
+  padding: 4px 8px;
+  font-size: 14px;
+  font-weight: 400;
   color: #ff9b71;
   cursor: pointer;
   transition: all 0.2s;
@@ -116,6 +116,7 @@
 
 .btn-back:hover {
   color: #ff7d47;
+  text-decoration: underline;
 }
 
 .form-hint {
