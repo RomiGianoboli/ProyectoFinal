@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:14-alpine
+    container_name: derwe-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: derwe_parent
+      POSTGRES_USER: derwe_user
+      POSTGRES_PASSWORD: derwe_password_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - derwe-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U derwe_user -d derwe_parent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Spring Boot
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: derwe-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Configuración de base de datos
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/derwe_parent
+      SPRING_DATASOURCE_USERNAME: derwe_user
+      SPRING_DATASOURCE_PASSWORD: derwe_password_2024
+      
+      # Configuración JPA/Hibernate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      
+      # Configuración JWT
+      JWT_SECRET: MiClaveSecretaSuperLargaYSeguraParaJWT2024DerWeParentProduccion
+      JWT_EXPIRATION: 86400000
+      
+      # Logging
+      LOGGING_LEVEL_COM_DERWE_PARENT: DEBUG
+      
+      # Puerto del servidor
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - derwe-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend React PWA
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8080/api
+    container_name: derwe-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5000:80"
+    networks:
+      - derwe-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Volúmenes persistentes
+volumes:
+  postgres_data:
+    driver: local
+
+# Red interna para comunicación entre servicios
+networks:
+  derwe-network:
+    driver: bridge
