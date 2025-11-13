@@ -105,19 +105,21 @@
 .btn-back {
   background: transparent;
   border: none;
-  padding: 4px;
-  font-size: 13px;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
   font-weight: 400;
   color: #ff9b71;
   cursor: pointer;
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
   position: absolute;
-  left: 12px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
+  white-space: nowrap;
 }
 
 .btn-back:hover {
