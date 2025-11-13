@@ -115,7 +115,7 @@
   white-space: nowrap !important;
   position: absolute !important;
   left: 16px !important;
-  top: 8px !important;
+  top: -8px !important;
   transform: none !important;
   width: auto !important;
   max-width: none !important;
