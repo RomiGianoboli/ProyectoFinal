@@ -6,19 +6,21 @@
 
 .form-header {
   background: white;
-  padding: 20px;
+  padding: 16px 20px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  position: relative;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
 }
 
 .form-header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: #2d2d2d;
   margin: 0;
+  text-align: center;
 }
 
 .form-content {
@@ -103,7 +105,7 @@
 .btn-back {
   background: transparent;
   border: none;
-  padding: 0;
+  padding: 4px;
   font-size: 13px;
   font-weight: 400;
   color: #ff9b71;
@@ -111,12 +113,15 @@
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .btn-back:hover {
   color: #ff7d47;
-  text-decoration: underline;
 }
 
 .form-hint {
