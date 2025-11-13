@@ -8,7 +8,6 @@ const AgregarHijo = () => {
   const [formData, setFormData] = useState({
     nombre: '',
     apellido: '',
-    fechaNacimiento: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,10 +44,6 @@ const AgregarHijo = () => {
       </header>
 
       <div className="form-content">
-        <div className="logo-small-center">
-          <h2>We<br/>Parent</h2>
-        </div>
-
         <form onSubmit={handleSubmit} className="form">
           <div className="form-group">
             <label>Nombre</label>
@@ -70,17 +65,6 @@ const AgregarHijo = () => {
               value={formData.apellido}
               onChange={handleChange}
               placeholder="Apellido del hijo"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Fecha de Nacimiento</label>
-            <input
-              type="date"
-              name="fechaNacimiento"
-              value={formData.fechaNacimiento}
-              onChange={handleChange}
               required
             />
           </div>
