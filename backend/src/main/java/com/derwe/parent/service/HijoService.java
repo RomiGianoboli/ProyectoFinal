@@ -29,6 +29,8 @@ public class HijoService {
         Padre padre = padreRepository.findById(padreId)
             .orElseThrow(() -> new RuntimeException("Padre no encontrado"));
         
+        Padre coPadre = buscarCoPadreVinculado(padreId);
+        
         Hijo hijo = new Hijo();
         hijo.setNombre(request.getNombre());
         hijo.setApellido(request.getApellido());
@@ -40,11 +42,54 @@ public class HijoService {
         relacion.setPadre(padre);
         relacion.setHijo(hijoGuardado);
         relacion.setEsPadreCreador(true);
-        relacion.setColorAsignado(null); // Color NULL hasta que el padre lo seleccione en el calendario
+        relacion.setColorAsignado(null);
         
         relacionRepository.save(relacion);
         
+        if (coPadre != null) {
+            RelacionPadreHijo relacionCoPadre = new RelacionPadreHijo();
+            relacionCoPadre.setPadre(coPadre);
+            relacionCoPadre.setHijo(hijoGuardado);
+            relacionCoPadre.setEsPadreCreador(false);
+            relacionCoPadre.setColorAsignado(null);
+            relacionRepository.save(relacionCoPadre);
+        }
+        
         return convertirAResponseDTO(hijoGuardado, padreId);
+    }
+    
+    private Padre buscarCoPadreVinculado(Long padreId) {
+        List<RelacionPadreHijo> relacionesPadre = relacionRepository.findByPadreId(padreId);
+        
+        if (relacionesPadre.isEmpty()) {
+            return null;
+        }
+        
+        Padre coPadreUnico = null;
+        
+        for (RelacionPadreHijo relacion : relacionesPadre) {
+            List<RelacionPadreHijo> relacionesHijo = relacionRepository.findByHijoId(relacion.getHijo().getId());
+            
+            Padre coPadreDelHijo = null;
+            for (RelacionPadreHijo relacionHijo : relacionesHijo) {
+                if (!relacionHijo.getPadre().getId().equals(padreId)) {
+                    coPadreDelHijo = relacionHijo.getPadre();
+                    break;
+                }
+            }
+            
+            if (coPadreDelHijo == null) {
+                return null;
+            }
+            
+            if (coPadreUnico == null) {
+                coPadreUnico = coPadreDelHijo;
+            } else if (!coPadreUnico.getId().equals(coPadreDelHijo.getId())) {
+                return null;
+            }
+        }
+        
+        return coPadreUnico;
     }
     
     @Transactional
