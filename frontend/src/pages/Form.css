@@ -103,27 +103,26 @@
 }
 
 .btn-back {
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
+  background: white;
+  border: 2px solid #ff9b71;
+  border-radius: 8px;
+  padding: 4px 12px;
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 500;
   color: #ff9b71;
   cursor: pointer;
   transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
+  white-space: nowrap;
   position: absolute;
   left: 16px;
   top: 50%;
   transform: translateY(-50%);
-  white-space: nowrap;
 }
 
 .btn-back:hover {
-  color: #ff7d47;
+  background: #f5f0e8;
+  transform: translateY(-50%) translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 155, 113, 0.2);
 }
 
 .form-hint {
