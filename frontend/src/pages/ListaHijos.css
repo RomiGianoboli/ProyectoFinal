@@ -118,6 +118,26 @@
   font-size: 16px;
 }
 
+.btn-agregar-hijo {
+  width: 100%;
+  padding: 16px;
+  background: white;
+  border: 2px solid #ff9b71;
+  border-radius: 12px;
+  color: #ff9b71;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.btn-agregar-hijo:hover {
+  background: #fff5f0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 155, 113, 0.2);
+}
+
 .btn-salir {
   width: 100%;
   padding: 16px;

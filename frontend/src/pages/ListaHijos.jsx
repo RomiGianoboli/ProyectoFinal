@@ -74,19 +74,28 @@ const ListaHijos = () => {
             </button>
           </div>
         ) : (
-          <div className="hijos-grid">
-            {hijos.map((hijo) => (
-              <button
-                key={hijo.id}
-                onClick={() => seleccionarHijo(hijo)}
-                className="hijo-card"
-              >
-                <span className="hijo-nombre">
-                  {hijo.nombre} {hijo.apellido}
-                </span>
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="hijos-grid">
+              {hijos.map((hijo) => (
+                <button
+                  key={hijo.id}
+                  onClick={() => seleccionarHijo(hijo)}
+                  className="hijo-card"
+                >
+                  <span className="hijo-nombre">
+                    {hijo.nombre} {hijo.apellido}
+                  </span>
+                </button>
+              ))}
+            </div>
+            
+            <button 
+              onClick={() => navigate('/agregar-hijo')}
+              className="btn-agregar-hijo"
+            >
+              + Agregar otro hijo/a
+            </button>
+          </>
         )}
 
         <button 
