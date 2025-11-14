@@ -57,7 +57,9 @@ docker-compose ps
 Deberías ver 3 contenedores corriendo:
 
 derwe-parent-db-1 (PostgreSQL)
+
 derwe-parent-backend-1 (Spring Boot)
+
 derwe-parent-frontend-1 (React + Vite)
 
 #### 4. Acceder a la aplicación
