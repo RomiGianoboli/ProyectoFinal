@@ -27,7 +27,7 @@ WeParent es una aplicación de coordinación parental, diseñada para gestionar 
 
 ---
 
-## Instalación con Docker (Recomendado)
+## Instalación con Docker 
 
 ### Requisitos Previos
 
