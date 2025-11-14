@@ -8,18 +8,6 @@ WeParent es una aplicación de coordinación parental, diseñada para gestionar 
 
 ---
 
-## Características Principales
-
-- Gestión de calendarios de custodia con codificación visual por colores (lila/celeste)
-- Registro y seguimiento de actividades de los hijos
-- Sistema de notificaciones entre co-padres
-- Solicitud y aprobación de cambios en fechas de custodia
-- Soporte para múltiples hijos con vinculación automática
-- Progressive Web App (instalable en dispositivos móviles)
-- Diseño optimizado para iPhone 11 y superiores
-
----
-
 ## Arquitectura Técnica
 
 ### Backend
@@ -35,7 +23,6 @@ WeParent es una aplicación de coordinación parental, diseñada para gestionar 
 - **Build Tool:** Vite 5.0.8
 - **Routing:** React Router 6.20
 - **HTTP Client:** Axios 1.6.2
-- **PWA:** Service Worker + Manifest
 - **Puerto:** 5000
 
 ---
