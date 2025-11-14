@@ -1,7 +1,6 @@
 # WeParent - Sistema de Coordinación Parental
 
-
-WeParent es una app diseñada para facilitar la coordinación entre co-padres en el cuidado de sus hijos. La aplicación permite gestionar calendarios de custodia, actividades compartidas, y mantener una comunicación organizada.
+WeParent es una aplicación de coordinación parental, diseñada para gestionar actividades, calendarios de custodia y comunicación entre co-padres.
 
 **Trabajo Final de Grado (TFG)** - Ingeniería en Software  
 **Universidad:** Universidad Siglo 21  
@@ -11,11 +10,11 @@ WeParent es una app diseñada para facilitar la coordinación entre co-padres en
 
 ## Características Principales
 
-- Gestión de calendarios de custodia con codificación visual por colores
+- Gestión de calendarios de custodia con codificación visual por colores (lila/celeste)
 - Registro y seguimiento de actividades de los hijos
 - Sistema de notificaciones entre co-padres
 - Solicitud y aprobación de cambios en fechas de custodia
-- Soporte para múltiples hijos
+- Soporte para múltiples hijos con vinculación automática
 - Progressive Web App (instalable en dispositivos móviles)
 - Diseño optimizado para iPhone 11 y superiores
 
@@ -41,158 +40,43 @@ WeParent es una app diseñada para facilitar la coordinación entre co-padres en
 
 ---
 
-## Requisitos Previos
+## Instalación con Docker (Recomendado)
 
-Antes de instalar DerWeParent, asegúrate de tener instalado el siguiente software:
+### Requisitos Previos
 
-### Backend
-- ☕ **Java Development Kit (JDK) 17 o superior**
-  - [Descargar OpenJDK](https://adoptium.net/)
-  - Verificar instalación: `java -version`
+Solamente necesitás tener instalado:
 
-- 📦 **Apache Maven 3.8 o superior**
-  - [Descargar Maven](https://maven.apache.org/download.cgi)
-  - Verificar instalación: `mvn -version`
+- **Docker** (versión 20.10 o superior)
+  - [Descargar Docker Desktop](https://www.docker.com/products/docker-desktop/)
+  - Verificar instalación: `docker --version`
 
-- 🐘 **PostgreSQL 14 o superior**
-  - [Descargar PostgreSQL](https://www.postgresql.org/download/)
-  - Verificar instalación: `psql --version`
+-  **Docker Compose** (generalmente incluido con Docker Desktop)
+  - Verificar instalación: `docker-compose --version`
 
-### Frontend
-- 🟢 **Node.js 18.x o superior** (incluye npm)
-  - [Descargar Node.js](https://nodejs.org/)
-  - Verificar instalación: `node -v` y `npm -v`
+### Pasos de Instalación
 
-### Herramientas adicionales
-- 🔧 **Git**
-  - [Descargar Git](https://git-scm.com/downloads)
-  - Verificar instalación: `git --version`
+#### 1. Clonar el repositorio
 
-- 💻 **IDE recomendado:**
-  - IntelliJ IDEA o VS Code (backend)
-  - VS Code (frontend)
-
----
-
-## Instalación
-
-### 1. Clonar el repositorio
-
-```bash
+bash
 git clone https://github.com/TU_USUARIO/derwe-parent.git
 cd derwe-parent
-```
 
-### 2. Configuración de la Base de Datos
+#### 2. Levantar los contenedores
+docker-compose up -d
 
-#### 2.1. Crear la base de datos PostgreSQL
+#### 3. Verificar que todo está funcionando
+docker-compose ps
 
-Abre una terminal de PostgreSQL:
+Deberías ver 3 contenedores corriendo:
 
-```bash
-psql -U postgres
-```
+derwe-parent-db-1 (PostgreSQL)
+derwe-parent-backend-1 (Spring Boot)
+derwe-parent-frontend-1 (React + Vite)
 
-Ejecuta los siguientes comandos SQL:
+#### 4. Acceder a la aplicación
 
-```sql
-CREATE DATABASE derwe_parent;
-CREATE USER derwe_user WITH PASSWORD 'tu_password_segura';
-GRANT ALL PRIVILEGES ON DATABASE derwe_parent TO derwe_user;
-\q
-```
+Abrí tu navegador en:
 
-#### 2.2. Configurar conexión del backend
-
-Edita el archivo `backend/src/main/resources/application.properties`:
-
-```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/derwe_parent
-spring.datasource.username=derwe_user
-spring.datasource.password=tu_password_segura
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-
-jwt.secret=TU_CLAVE_SECRETA_JWT_MUY_LARGA_Y_SEGURA_DE_AL_MENOS_256_BITS
-jwt.expiration=86400000
-```
-
-> **Nota de seguridad:** Cambia `jwt.secret` por una clave única y segura de al menos 256 bits.
-
-### 3. Instalación del Backend
-
-#### 3.1. Navegar a la carpeta del backend
-
-```bash
-cd backend
-```
-
-#### 3.2. Instalar dependencias y compilar
-
-```bash
-mvn clean install
-```
-
-Este comando:
-- Descargará todas las dependencias de Maven
-- Compilará el código Java
-- Ejecutará los tests (si existen)
-- Generará el archivo JAR ejecutable
-
-#### 3.3. Ejecutar el backend
-
-```bash
-mvn spring-boot:run
-```
-
-El backend estará disponible en: `http://localhost:8080`
-
-**Verificación:** Abre tu navegador y visita `http://localhost:8080` para confirmar que el servidor está activo.
-
-### 4. Instalación del Frontend
-
-#### 4.1. Abrir una nueva terminal y navegar al frontend
-
-```bash
-cd frontend
-```
-
-#### 4.2. Instalar dependencias
-
-```bash
-npm install
-```
-
-Este comando descargará todas las dependencias de Node.js especificadas en `package.json`.
-
-#### 4.3. Configurar variables de entorno
-
-Copia el archivo de ejemplo:
-
-```bash
-cp .env.example .env
-```
-
-Edita el archivo `.env` y configura la URL del backend:
-
-```env
-VITE_API_URL=http://localhost:8080/api
-```
-
-#### 4.4. Ejecutar el frontend en modo desarrollo
-
-```bash
-npm run dev
-```
-
-El frontend estará disponible en: `http://localhost:5000`
-
-**Verificación:** Abre tu navegador en `http://localhost:5000` y deberías ver la pantalla de login de DerWeParent.
-
----
-
-
-
-
+Frontend (aplicación principal): http://localhost:5000
+Backend API: http://localhost:8080/api
+Base de datos PostgreSQL: localhost:5432
