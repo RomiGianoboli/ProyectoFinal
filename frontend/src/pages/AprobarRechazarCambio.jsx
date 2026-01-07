@@ -259,51 +259,69 @@ const AprobarRechazarCambio = () => {
           marginTop: '16px',
           textAlign: 'center'
         }}>
-          <p style={{ fontWeight: '600', marginBottom: '12px', fontSize: '14px' }}>
-            ¿Apruebas esta solicitud?
-          </p>
-          
-          <div style={{ 
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '12px',
-            marginBottom: '12px'
-          }}>
-            <button 
-              onClick={handleAprobar}
-              disabled={procesando}
-              style={{
-                background: '#ff9b71',
-                color: 'white',
-                border: 'none',
-                padding: '12px 16px',
-                borderRadius: '10px',
-                fontWeight: '700',
-                fontSize: '16px',
-                cursor: procesando ? 'not-allowed' : 'pointer',
-                opacity: procesando ? 0.6 : 1
-              }}
-            >
-              {procesando ? '...' : 'SI'}
-            </button>
-            <button 
-              onClick={handleRechazar}
-              disabled={procesando}
-              style={{
-                background: '#F7F0E7',
-                color: '#666',
-                border: '2px solid #ddd',
-                padding: '12px 16px',
-                borderRadius: '10px',
-                fontWeight: '700',
-                fontSize: '16px',
-                cursor: procesando ? 'not-allowed' : 'pointer',
-                opacity: procesando ? 0.6 : 1
-              }}
-            >
-              {procesando ? '...' : 'NO'}
-            </button>
-          </div>
+          {solicitud.estado === 'PENDIENTE' ? (
+            <>
+              <p style={{ fontWeight: '600', marginBottom: '12px', fontSize: '14px' }}>
+                ¿Apruebas esta solicitud?
+              </p>
+              
+              <div style={{ 
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '12px',
+                marginBottom: '12px'
+              }}>
+                <button 
+                  onClick={handleAprobar}
+                  disabled={procesando}
+                  style={{
+                    background: '#ff9b71',
+                    color: 'white',
+                    border: 'none',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    fontWeight: '700',
+                    fontSize: '16px',
+                    cursor: procesando ? 'not-allowed' : 'pointer',
+                    opacity: procesando ? 0.6 : 1
+                  }}
+                >
+                  {procesando ? '...' : 'SI'}
+                </button>
+                <button 
+                  onClick={handleRechazar}
+                  disabled={procesando}
+                  style={{
+                    background: '#F7F0E7',
+                    color: '#666',
+                    border: '2px solid #ddd',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    fontWeight: '700',
+                    fontSize: '16px',
+                    cursor: procesando ? 'not-allowed' : 'pointer',
+                    opacity: procesando ? 0.6 : 1
+                  }}
+                >
+                  {procesando ? '...' : 'NO'}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div style={{ padding: '8px 0' }}>
+              <p style={{ 
+                fontWeight: '600', 
+                marginBottom: '8px', 
+                fontSize: '14px',
+                color: solicitud.estado === 'APROBADA' ? '#22c55e' : '#dc2626'
+              }}>
+                Solicitud {solicitud.estado === 'APROBADA' ? 'Aprobada' : 'Rechazada'}
+              </p>
+              <p style={{ fontSize: '12px', color: '#666' }}>
+                Esta solicitud ya fue procesada
+              </p>
+            </div>
+          )}
 
           <button 
             onClick={() => navigate('/notificaciones')}
