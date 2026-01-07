@@ -129,8 +129,8 @@ const EstablecerCustodia = () => {
       return;
     }
 
-    let fecha = new Date(fechaDesde);
-    const fin = new Date(fechaHasta);
+    let fecha = new Date(fechaDesde + 'T00:00:00');
+    const fin = new Date(fechaHasta + 'T00:00:00');
     
     while (fecha <= fin) {
       const fechaStr = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getDate().toString().padStart(2, '0')}`;

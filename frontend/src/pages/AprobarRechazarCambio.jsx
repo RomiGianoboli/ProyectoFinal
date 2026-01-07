@@ -254,32 +254,32 @@ const AprobarRechazarCambio = () => {
 
         <div style={{
           background: 'white',
-          padding: '20px',
+          padding: '12px 16px',
           borderRadius: '12px',
-          marginTop: '20px',
+          marginTop: '16px',
           textAlign: 'center'
         }}>
-          <p style={{ fontWeight: '600', marginBottom: '16px', fontSize: '16px' }}>
+          <p style={{ fontWeight: '600', marginBottom: '12px', fontSize: '14px' }}>
             ¿Apruebas esta solicitud?
           </p>
           
           <div style={{ 
             display: 'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: '16px',
-            marginBottom: '16px'
+            gap: '12px',
+            marginBottom: '12px'
           }}>
             <button 
               onClick={handleAprobar}
               disabled={procesando}
               style={{
-                background: '#22c55e',
+                background: '#ff9b71',
                 color: 'white',
                 border: 'none',
-                padding: '16px 24px',
-                borderRadius: '12px',
+                padding: '12px 16px',
+                borderRadius: '10px',
                 fontWeight: '700',
-                fontSize: '18px',
+                fontSize: '16px',
                 cursor: procesando ? 'not-allowed' : 'pointer',
                 opacity: procesando ? 0.6 : 1
               }}
@@ -290,13 +290,13 @@ const AprobarRechazarCambio = () => {
               onClick={handleRechazar}
               disabled={procesando}
               style={{
-                background: '#dc2626',
-                color: 'white',
-                border: 'none',
-                padding: '16px 24px',
-                borderRadius: '12px',
+                background: '#F7F0E7',
+                color: '#666',
+                border: '2px solid #ddd',
+                padding: '12px 16px',
+                borderRadius: '10px',
                 fontWeight: '700',
-                fontSize: '18px',
+                fontSize: '16px',
                 cursor: procesando ? 'not-allowed' : 'pointer',
                 opacity: procesando ? 0.6 : 1
               }}
@@ -310,14 +310,14 @@ const AprobarRechazarCambio = () => {
             style={{
               background: 'transparent',
               color: '#666',
-              border: '1px solid #ddd',
-              padding: '10px 20px',
-              borderRadius: '8px',
+              border: 'none',
+              padding: '8px',
               cursor: 'pointer',
-              fontSize: '14px'
+              fontSize: '12px',
+              textDecoration: 'underline'
             }}
           >
-            Volver a notificaciones
+            Volver
           </button>
         </div>
       </div>
