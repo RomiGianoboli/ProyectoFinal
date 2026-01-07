@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { solicitudAPI } from '../services/api';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { solicitudAPI, notificacionAPI } from '../services/api';
 import './Calendario.css';
 
 const AprobarRechazarCambio = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const solicitudId = searchParams.get('id');
   
@@ -14,14 +13,15 @@ const AprobarRechazarCambio = () => {
   const [procesando, setProcesando] = useState(false);
   const [loading, setLoading] = useState(true);
   const [fechaActual, setFechaActual] = useState(new Date());
+  const [notificacionesCount, setNotificacionesCount] = useState(0);
 
   useEffect(() => {
-    cargarSolicitud();
+    cargarDatos();
   }, [solicitudId]);
 
-  const cargarSolicitud = async () => {
+  const cargarDatos = async () => {
     if (!solicitudId) {
-      navigate('/calendario');
+      navigate('/notificaciones');
       return;
     }
 
@@ -31,12 +31,18 @@ const AprobarRechazarCambio = () => {
         setHijo(JSON.parse(hijoGuardado));
       }
 
-      const response = await solicitudAPI.recibidas();
-      const solicitudEncontrada = response.data.find(s => s.id === parseInt(solicitudId));
+      const [solicitudesRes, notifRes] = await Promise.all([
+        solicitudAPI.recibidas(),
+        notificacionAPI.contadorNoLeidas()
+      ]);
+      
+      setNotificacionesCount(notifRes.data);
+      
+      const solicitudEncontrada = solicitudesRes.data.find(s => s.id === parseInt(solicitudId));
       
       if (!solicitudEncontrada) {
         alert('Solicitud no encontrada');
-        navigate('/calendario');
+        navigate('/notificaciones');
         return;
       }
       
@@ -47,7 +53,7 @@ const AprobarRechazarCambio = () => {
     } catch (error) {
       console.error('Error al cargar solicitud:', error);
       alert('Error al cargar la solicitud');
-      navigate('/calendario');
+      navigate('/notificaciones');
     } finally {
       setLoading(false);
     }
@@ -58,7 +64,7 @@ const AprobarRechazarCambio = () => {
     
     try {
       await solicitudAPI.aprobar(solicitud.id);
-      alert('Cambio aprobado exitosamente');
+      alert('Solicitud aprobada. Las fechas han sido asignadas.');
       navigate('/calendario', { state: { hijo } });
     } catch (error) {
       console.error('Error al aprobar:', error);
@@ -88,6 +94,18 @@ const AprobarRechazarCambio = () => {
     const dia = date.getDate();
     const mes = date.toLocaleString('es', { month: 'long' });
     return `${dia} de ${mes}`;
+  };
+
+  const mesAnterior = () => {
+    const nuevaFecha = new Date(fechaActual);
+    nuevaFecha.setMonth(nuevaFecha.getMonth() - 1);
+    setFechaActual(nuevaFecha);
+  };
+
+  const mesSiguiente = () => {
+    const nuevaFecha = new Date(fechaActual);
+    nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);
+    setFechaActual(nuevaFecha);
   };
 
   const getDiasDelMes = () => {
@@ -143,7 +161,7 @@ const AprobarRechazarCambio = () => {
     );
   }
 
-  if (!solicitud || !hijo) {
+  if (!solicitud) {
     return (
       <div className="calendario-page">
         <div className="loading">Solicitud no encontrada</div>
@@ -155,102 +173,151 @@ const AprobarRechazarCambio = () => {
     <div className="calendario-page">
       <div className="calendario-container">
         <div className="calendario-header">
-          <h1 className="logo-calendario">We<br/>Parent</h1>
-          <button className="btn-notification">🔔</button>
+          <div className="logo-calendario">
+            <h1>We<br/>Parent</h1>
+          </div>
+          <button 
+            className="btn-notification-cal" 
+            onClick={() => navigate('/notificaciones')}
+            style={{ position: 'relative' }}
+          >
+            🔔
+            {notificacionesCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-5px',
+                right: '-5px',
+                background: '#dc2626',
+                color: 'white',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {notificacionesCount}
+              </span>
+            )}
+          </button>
         </div>
 
-        {hijo.colorPadre && (
-          <p className="tu-color-label">
-            Tu color: 
-            <span 
-              className="color-badge-inline" 
-              style={{ 
-                backgroundColor: hijo.colorPadre === 'LILA' ? '#d8b4fe' : '#7dd3fc',
-                marginLeft: '8px',
-                padding: '2px 12px',
-                borderRadius: '12px',
-                color: '#1f2937',
-                fontWeight: '600'
-              }}
-            >
-              {hijo.colorPadre}
-            </span>
-          </p>
-        )}
+        <div className="calendario-card">
+          <div className="mes-navegacion">
+            <button onClick={mesAnterior} className="btn-nav">
+              <span>&lt;</span>
+            </button>
+            <h2 className="mes-titulo">{nombresMeses[fechaActual.getMonth()]} {fechaActual.getFullYear()}</h2>
+            <button onClick={mesSiguiente} className="btn-nav">
+              <span>&gt;</span>
+            </button>
+          </div>
 
-        <div className="mes-navegacion">
-          <h2 className="mes-titulo">{nombresMeses[fechaActual.getMonth()]} {fechaActual.getFullYear()}</h2>
+          <div style={{
+            background: '#fff8f0',
+            padding: '16px',
+            borderRadius: '12px',
+            marginBottom: '20px',
+            textAlign: 'center',
+            border: '2px solid #ff9b71'
+          }}>
+            <p style={{ fontWeight: '600', marginBottom: '8px', color: '#1f2937', fontSize: '16px' }}>
+              {solicitud.nombreSolicitante || 'El co-padre'} solicita estas fechas de custodia:
+            </p>
+            <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#ff9b71', marginBottom: '8px' }}>
+              Del {formatearFecha(solicitud.fechaDesde)} al {formatearFecha(solicitud.fechaHasta)}
+            </p>
+            <p style={{ fontSize: '14px', color: '#666' }}>
+              Los días resaltados en morado serían asignados
+            </p>
+          </div>
+
+          <div className="dias-semana-row">
+            {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((dia, index) => (
+              <div key={index} className="dia-semana-header">{dia}</div>
+            ))}
+          </div>
+
+          <div className="dias-grid">
+            {getDiasDelMes().map((dia, index) => (
+              <div
+                key={index}
+                className={getDiaClase(dia)}
+              >
+                {dia.vacio ? '' : dia.numero}
+              </div>
+            ))}
+          </div>
         </div>
 
         <div style={{
           background: 'white',
-          padding: '16px',
+          padding: '20px',
           borderRadius: '12px',
-          marginBottom: '20px',
+          marginTop: '20px',
           textAlign: 'center'
         }}>
-          <p style={{ fontWeight: '600', marginBottom: '8px', color: '#1f2937' }}>
-            Solicitaron cambio del {formatearFecha(solicitud.fechaDesde)} al {formatearFecha(solicitud.fechaHasta)}
+          <p style={{ fontWeight: '600', marginBottom: '16px', fontSize: '16px' }}>
+            ¿Apruebas esta solicitud?
           </p>
-          <p style={{ fontSize: '14px', color: '#666' }}>
-            Los días resaltados serían intercambiados
-          </p>
-        </div>
-
-        <div className="semana-header">
-          {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map((dia, index) => (
-            <div key={index} className="dia-semana">{dia}</div>
-          ))}
-        </div>
-
-        <div className="calendario-grid">
-          {getDiasDelMes().map((dia, index) => (
-            <div
-              key={index}
-              className={getDiaClase(dia)}
+          
+          <div style={{ 
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '16px',
+            marginBottom: '16px'
+          }}>
+            <button 
+              onClick={handleAprobar}
+              disabled={procesando}
+              style={{
+                background: '#22c55e',
+                color: 'white',
+                border: 'none',
+                padding: '16px 24px',
+                borderRadius: '12px',
+                fontWeight: '700',
+                fontSize: '18px',
+                cursor: procesando ? 'not-allowed' : 'pointer',
+                opacity: procesando ? 0.6 : 1
+              }}
             >
-              {dia.vacio ? '' : dia.numero}
-            </div>
-          ))}
-        </div>
+              {procesando ? '...' : 'SI'}
+            </button>
+            <button 
+              onClick={handleRechazar}
+              disabled={procesando}
+              style={{
+                background: '#dc2626',
+                color: 'white',
+                border: 'none',
+                padding: '16px 24px',
+                borderRadius: '12px',
+                fontWeight: '700',
+                fontSize: '18px',
+                cursor: procesando ? 'not-allowed' : 'pointer',
+                opacity: procesando ? 0.6 : 1
+              }}
+            >
+              {procesando ? '...' : 'NO'}
+            </button>
+          </div>
 
-        <div className="calendario-acciones" style={{ 
-          marginTop: '20px',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '12px'
-        }}>
           <button 
-            className="btn-volver-cal" 
-            onClick={() => navigate('/calendario', { state: { hijo } })}
-            style={{ gridColumn: '1' }}
-          >
-            Volver
-          </button>
-          <button 
-            className="btn-rechazar" 
-            onClick={handleRechazar}
-            disabled={procesando}
+            onClick={() => navigate('/notificaciones')}
             style={{
-              gridColumn: '2',
-              background: '#dc2626',
-              color: 'white',
-              border: 'none',
-              padding: '12px',
+              background: 'transparent',
+              color: '#666',
+              border: '1px solid #ddd',
+              padding: '10px 20px',
               borderRadius: '8px',
-              fontWeight: '600',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              fontSize: '14px'
             }}
           >
-            Rechazar
-          </button>
-          <button 
-            className="btn-establecer-custodia" 
-            onClick={handleAprobar}
-            disabled={procesando}
-            style={{ gridColumn: '3' }}
-          >
-            {procesando ? 'Procesando...' : 'Aprobar'}
+            Volver a notificaciones
           </button>
         </div>
       </div>
