@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { hijoAPI } from '../services/api';
+import { hijoAPI, notificacionAPI } from '../services/api';
 import './ListaHijos.css';
 
 const ListaHijos = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [hijos, setHijos] = useState([]);
+  const [notificacionesCount, setNotificacionesCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    cargarHijos();
+    cargarDatos();
   }, []);
 
-  const cargarHijos = async () => {
+  const cargarDatos = async () => {
     try {
-      const response = await hijoAPI.misHijos();
-      setHijos(response.data);
+      const [hijosRes, notifRes] = await Promise.all([
+        hijoAPI.misHijos(),
+        notificacionAPI.contadorNoLeidas()
+      ]);
+      setHijos(hijosRes.data);
+      setNotificacionesCount(notifRes.data);
     } catch (error) {
-      console.error('Error al cargar hijos:', error);
+      console.error('Error al cargar datos:', error);
     } finally {
       setLoading(false);
     }
@@ -50,8 +55,31 @@ const ListaHijos = () => {
           <div className="logo-lista">
             <h1>We<br/>Parent</h1>
           </div>
-          <button className="btn-notification">
+          <button 
+            className="btn-notification"
+            onClick={() => navigate('/notificaciones')}
+            style={{ position: 'relative' }}
+          >
             <span className="bell-icon">🔔</span>
+            {notificacionesCount > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-5px',
+                right: '-5px',
+                background: '#dc2626',
+                color: 'white',
+                borderRadius: '50%',
+                width: '20px',
+                height: '20px',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {notificacionesCount}
+              </span>
+            )}
           </button>
         </div>
 
