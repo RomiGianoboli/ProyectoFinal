@@ -68,8 +68,10 @@ export const calendarioAPI = {
 export const notificacionAPI = {
   misNotificaciones: () => api.get('/notificaciones'),
   noLeidas: () => api.get('/notificaciones/no-leidas'),
-  marcarLeida: (id) => api.post(`/notificaciones/${id}/leer`),
+  marcarLeida: (id) => api.put(`/notificaciones/${id}/leer`),
+  marcarTodasLeidas: () => api.put('/notificaciones/leer-todas'),
   contadorNoLeidas: () => api.get('/notificaciones/contador'),
+  eliminar: (id) => api.delete(`/notificaciones/${id}`),
 };
 
 export const invitacionAPI = {
@@ -81,11 +83,11 @@ export const invitacionAPI = {
 
 export const solicitudAPI = {
   crear: (data) => api.post('/solicitudes-cambio', data),
-  aprobar: (id) => api.post(`/solicitudes-cambio/${id}/aprobar`),
-  rechazar: (id) => api.post(`/solicitudes-cambio/${id}/rechazar`),
+  aprobar: (id) => api.put(`/solicitudes-cambio/${id}/aprobar`),
+  rechazar: (id) => api.put(`/solicitudes-cambio/${id}/rechazar`),
   enviadas: () => api.get('/solicitudes-cambio/enviadas'),
   recibidas: () => api.get('/solicitudes-cambio/recibidas'),
-  porHijo: (hijoId) => api.get(`/solicitudes-cambio/hijo/${hijoId}`),
+  pendientes: () => api.get('/solicitudes-cambio/pendientes'),
 };
 
 export default api;

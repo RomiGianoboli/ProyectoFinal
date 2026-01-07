@@ -22,6 +22,9 @@ public class SolicitudCambioRequestDTO {
     @NotNull(message = "La fecha hasta es obligatoria")
     private LocalDate fechaHasta;
     
+    @NotNull(message = "El tipo de solicitud es obligatorio")
+    private String tipoSolicitud; // ESTABLECER o CAMBIO
+    
     @Size(max = 500, message = "El motivo no puede exceder 500 caracteres")
     private String motivo;
 }

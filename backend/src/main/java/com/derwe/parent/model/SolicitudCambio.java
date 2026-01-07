@@ -46,6 +46,10 @@ public class SolicitudCambio {
     @Column(nullable = false, length = 20)
     private EstadoSolicitud estado = EstadoSolicitud.PENDIENTE;
     
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private TipoSolicitudCustodia tipoSolicitud = TipoSolicitudCustodia.ESTABLECER;
+    
     @Size(max = 500, message = "El motivo no puede exceder 500 caracteres")
     @Column(length = 500)
     private String motivo;

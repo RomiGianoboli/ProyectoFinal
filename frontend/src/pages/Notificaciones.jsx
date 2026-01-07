@@ -52,14 +52,18 @@ const Notificaciones = () => {
         return '✏️';
       case 'ACTIVIDAD_ELIMINADA':
         return '🗑️';
-      case 'CUSTODIA_CAMBIADA':
-        return '🔄';
-      case 'SOLICITUD_CAMBIO':
+      case 'ACTIVIDAD_PENDIENTE_APROBACION':
+        return '⏳';
+      case 'SOLICITUD_CAMBIO_CUSTODIA':
         return '📩';
-      case 'SOLICITUD_APROBADA':
+      case 'CAMBIO_CUSTODIA_APROBADO':
         return '✅';
-      case 'SOLICITUD_RECHAZADA':
+      case 'CAMBIO_CUSTODIA_RECHAZADO':
         return '❌';
+      case 'INVITACION_RECIBIDA':
+        return '💌';
+      case 'INVITACION_ACEPTADA':
+        return '🤝';
       default:
         return '🔔';
     }

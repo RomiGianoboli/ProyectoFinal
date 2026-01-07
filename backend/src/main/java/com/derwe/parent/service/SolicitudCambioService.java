@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class SolicitudCambioService {
     
     private final SolicitudCambioRepository solicitudCambioRepository;
+    private final FechaCustodiaRepository fechaCustodiaRepository;
     private final HijoRepository hijoRepository;
     private final PadreRepository padreRepository;
     private final RelacionPadreHijoRepository relacionRepository;
@@ -24,52 +27,84 @@ public class SolicitudCambioService {
     
     @Transactional
     public SolicitudCambioResponseDTO crearSolicitudCambio(Long padreId, SolicitudCambioRequestDTO request) {
-        // Validar padre e hijo
         Padre padreSolicitante = padreRepository.findById(padreId)
             .orElseThrow(() -> new RuntimeException("Padre no encontrado"));
         
         Hijo hijo = hijoRepository.findById(request.getHijoId())
             .orElseThrow(() -> new RuntimeException("Hijo no encontrado"));
         
-        // Validar relación
         if (!relacionRepository.existsByPadreIdAndHijoId(padreId, request.getHijoId())) {
             throw new RuntimeException("No tienes acceso a este hijo");
         }
         
-        // Validar fechas
         if (request.getFechaHasta().isBefore(request.getFechaDesde())) {
             throw new RuntimeException("La fecha hasta debe ser posterior a la fecha desde");
         }
         
-        // Obtener co-padre
+        TipoSolicitudCustodia tipoSolicitud = TipoSolicitudCustodia.valueOf(request.getTipoSolicitud());
+        
+        if (tipoSolicitud == TipoSolicitudCustodia.ESTABLECER) {
+            List<LocalDate> fechasOcupadas = verificarFechasOcupadas(
+                hijo.getId(), 
+                request.getFechaDesde(), 
+                request.getFechaHasta()
+            );
+            
+            if (!fechasOcupadas.isEmpty()) {
+                throw new RuntimeException("Las siguientes fechas ya están ocupadas: " + 
+                    fechasOcupadas.stream()
+                        .map(LocalDate::toString)
+                        .collect(Collectors.joining(", ")));
+            }
+        }
+        
         Padre padreReceptor = relacionRepository.findByHijoId(hijo.getId()).stream()
             .filter(r -> !r.getPadre().getId().equals(padreId))
             .map(RelacionPadreHijo::getPadre)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("Co-padre no encontrado"));
         
-        // Crear solicitud
         SolicitudCambio solicitud = new SolicitudCambio();
         solicitud.setHijo(hijo);
         solicitud.setPadreSolicitante(padreSolicitante);
         solicitud.setPadreReceptor(padreReceptor);
         solicitud.setFechaDesde(request.getFechaDesde());
         solicitud.setFechaHasta(request.getFechaHasta());
+        solicitud.setTipoSolicitud(tipoSolicitud);
         solicitud.setMotivo(request.getMotivo());
         solicitud.setEstado(EstadoSolicitud.PENDIENTE);
         
         SolicitudCambio solicitudGuardada = solicitudCambioRepository.save(solicitud);
         
-        // Notificar al padre receptor
+        String tipoTexto = tipoSolicitud == TipoSolicitudCustodia.ESTABLECER 
+            ? "establecer fechas de custodia" 
+            : "cambio de fechas de custodia";
+        
         notificacionService.crearNotificacion(
             padreReceptor.getId(),
             TipoNotificacion.SOLICITUD_CAMBIO_CUSTODIA,
             solicitudGuardada.getId(),
-            "Nueva solicitud de cambio de custodia del " + 
+            padreSolicitante.getNombre() + " " + padreSolicitante.getApellido() + 
+            " solicita " + tipoTexto + " del " + 
             request.getFechaDesde() + " al " + request.getFechaHasta()
         );
         
         return convertirAResponseDTO(solicitudGuardada);
+    }
+    
+    private List<LocalDate> verificarFechasOcupadas(Long hijoId, LocalDate fechaDesde, LocalDate fechaHasta) {
+        List<LocalDate> fechasOcupadas = new ArrayList<>();
+        
+        List<FechaCustodia> custodiasExistentes = fechaCustodiaRepository
+            .findByHijoIdAndFechaBetween(hijoId, fechaDesde, fechaHasta);
+        
+        for (FechaCustodia custodia : custodiasExistentes) {
+            if (custodia.getEstado() == EstadoCustodia.CONFIRMADA) {
+                fechasOcupadas.add(custodia.getFecha());
+            }
+        }
+        
+        return fechasOcupadas;
     }
     
     @Transactional
@@ -77,31 +112,55 @@ public class SolicitudCambioService {
         SolicitudCambio solicitud = solicitudCambioRepository.findById(solicitudId)
             .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
         
-        // Validar que sea el padre receptor
         if (!solicitud.getPadreReceptor().getId().equals(padreId)) {
             throw new RuntimeException("No tienes permiso para aprobar esta solicitud");
         }
         
-        // Validar estado
         if (solicitud.getEstado() != EstadoSolicitud.PENDIENTE) {
             throw new RuntimeException("La solicitud ya fue procesada");
         }
         
-        // Aprobar
         solicitud.setEstado(EstadoSolicitud.APROBADA);
         solicitud.setFechaResolucion(LocalDateTime.now());
         
         SolicitudCambio solicitudActualizada = solicitudCambioRepository.save(solicitud);
         
-        // Notificar al solicitante
+        crearFechasCustodia(solicitud);
+        
+        Padre padreReceptor = solicitud.getPadreReceptor();
+        String nombreCompleto = padreReceptor.getNombre() + " " + padreReceptor.getApellido();
+        
         notificacionService.crearNotificacion(
             solicitud.getPadreSolicitante().getId(),
             TipoNotificacion.CAMBIO_CUSTODIA_APROBADO,
             solicitudId,
-            "Tu solicitud de cambio de custodia fue aprobada"
+            nombreCompleto + " ha aprobado las fechas seleccionadas del " + 
+            solicitud.getFechaDesde() + " al " + solicitud.getFechaHasta()
         );
         
         return convertirAResponseDTO(solicitudActualizada);
+    }
+    
+    private void crearFechasCustodia(SolicitudCambio solicitud) {
+        LocalDate fechaActual = solicitud.getFechaDesde();
+        
+        while (!fechaActual.isAfter(solicitud.getFechaHasta())) {
+            fechaCustodiaRepository.findByHijoIdAndFecha(
+                solicitud.getHijo().getId(), 
+                fechaActual
+            ).ifPresent(fechaCustodiaRepository::delete);
+            
+            FechaCustodia nuevaFecha = new FechaCustodia();
+            nuevaFecha.setHijo(solicitud.getHijo());
+            nuevaFecha.setPadreResponsable(solicitud.getPadreSolicitante());
+            nuevaFecha.setFecha(fechaActual);
+            nuevaFecha.setEstado(EstadoCustodia.CONFIRMADA);
+            nuevaFecha.setTipoCustodia("DIA_COMPLETO");
+            
+            fechaCustodiaRepository.save(nuevaFecha);
+            
+            fechaActual = fechaActual.plusDays(1);
+        }
     }
     
     @Transactional
@@ -109,28 +168,28 @@ public class SolicitudCambioService {
         SolicitudCambio solicitud = solicitudCambioRepository.findById(solicitudId)
             .orElseThrow(() -> new RuntimeException("Solicitud no encontrada"));
         
-        // Validar que sea el padre receptor
         if (!solicitud.getPadreReceptor().getId().equals(padreId)) {
             throw new RuntimeException("No tienes permiso para rechazar esta solicitud");
         }
         
-        // Validar estado
         if (solicitud.getEstado() != EstadoSolicitud.PENDIENTE) {
             throw new RuntimeException("La solicitud ya fue procesada");
         }
         
-        // Rechazar
         solicitud.setEstado(EstadoSolicitud.RECHAZADA);
         solicitud.setFechaResolucion(LocalDateTime.now());
         
         SolicitudCambio solicitudActualizada = solicitudCambioRepository.save(solicitud);
         
-        // Notificar al solicitante
+        Padre padreReceptor = solicitud.getPadreReceptor();
+        String nombreCompleto = padreReceptor.getNombre() + " " + padreReceptor.getApellido();
+        
         notificacionService.crearNotificacion(
             solicitud.getPadreSolicitante().getId(),
             TipoNotificacion.CAMBIO_CUSTODIA_RECHAZADO,
             solicitudId,
-            "Tu solicitud de cambio de custodia fue rechazada"
+            nombreCompleto + " ha rechazado las fechas seleccionadas del " + 
+            solicitud.getFechaDesde() + " al " + solicitud.getFechaHasta()
         );
         
         return convertirAResponseDTO(solicitudActualizada);
@@ -151,6 +210,13 @@ public class SolicitudCambioService {
     }
     
     @Transactional(readOnly = true)
+    public List<SolicitudCambioResponseDTO> obtenerSolicitudesPendientes(Long padreId) {
+        return solicitudCambioRepository.findByPadreReceptorIdAndEstado(padreId, EstadoSolicitud.PENDIENTE).stream()
+            .map(this::convertirAResponseDTO)
+            .collect(Collectors.toList());
+    }
+    
+    @Transactional(readOnly = true)
     public List<SolicitudCambioResponseDTO> obtenerSolicitudesPorEstado(Long padreId, EstadoSolicitud estado) {
         return solicitudCambioRepository.findByPadreReceptorIdAndEstado(padreId, estado).stream()
             .map(this::convertirAResponseDTO)
@@ -165,6 +231,7 @@ public class SolicitudCambioService {
         dto.setFechaDesde(solicitud.getFechaDesde());
         dto.setFechaHasta(solicitud.getFechaHasta());
         dto.setEstado(solicitud.getEstado().name());
+        dto.setTipoSolicitud(solicitud.getTipoSolicitud().name());
         dto.setMotivo(solicitud.getMotivo());
         dto.setPadreSolicitanteId(solicitud.getPadreSolicitante().getId());
         dto.setNombrePadreSolicitante(

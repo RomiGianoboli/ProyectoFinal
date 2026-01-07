@@ -10,7 +10,7 @@ const SolicitarCambio = () => {
   
   const [hijo, setHijo] = useState(null);
   const [fechaActual, setFechaActual] = useState(new Date());
-  const [diasCustodia, setDiasCustodia] = useState([]);
+  const [todasLasCustodias, setTodasLasCustodias] = useState([]);
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -29,18 +29,17 @@ const SolicitarCambio = () => {
 
   useEffect(() => {
     if (hijo) {
-      cargarDiasCustodia();
+      cargarTodasLasCustodias();
     }
   }, [hijo, fechaActual]);
 
-  const cargarDiasCustodia = async () => {
+  const cargarTodasLasCustodias = async () => {
     try {
       const anio = fechaActual.getFullYear();
       const mes = fechaActual.getMonth() + 1;
       
       const response = await custodiaAPI.porMes(hijo.id, anio, mes);
-      const misCustodias = response.data.filter(c => c.esMiCustodia && c.estado === 'CONFIRMADA');
-      setDiasCustodia(misCustodias.map(c => c.fecha));
+      setTodasLasCustodias(response.data.filter(c => c.estado === 'CONFIRMADA'));
     } catch (error) {
       console.error('Error al cargar custodias:', error);
     }
@@ -76,13 +75,15 @@ const SolicitarCambio = () => {
     
     for (let dia = 1; dia <= totalDias; dia++) {
       const fecha = `${anio}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
-      const esMiCustodia = diasCustodia.includes(fecha);
+      const custodia = todasLasCustodias.find(c => c.fecha === fecha);
       
       dias.push({
         numero: dia,
         vacio: false,
-        esMiCustodia,
-        fecha
+        fecha,
+        tieneCustodia: !!custodia,
+        esMiCustodia: custodia?.esMiCustodia,
+        color: custodia?.colorPadreResponsable
       });
     }
     
@@ -92,14 +93,17 @@ const SolicitarCambio = () => {
   const getDiaClase = (dia) => {
     if (dia.vacio || !dia.numero) return 'dia-celda vacio';
     
-    const seleccionado = fechaDesde && fechaHasta && 
-                        dia.fecha >= fechaDesde && 
-                        dia.fecha <= fechaHasta && 
-                        dia.esMiCustodia;
+    const enRango = fechaDesde && fechaHasta && 
+                    dia.fecha >= fechaDesde && 
+                    dia.fecha <= fechaHasta;
     
-    if (dia.esMiCustodia) {
-      const colorClase = hijo?.colorPadre === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
-      return `dia-celda ${colorClase} ${seleccionado ? 'dia-seleccionado' : ''}`;
+    if (dia.tieneCustodia) {
+      const colorClase = dia.color === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
+      return `dia-celda ${colorClase} ${enRango ? 'dia-seleccionado' : ''}`;
+    }
+    
+    if (enRango) {
+      return 'dia-celda seleccionado';
     }
     
     return 'dia-celda';
@@ -116,20 +120,6 @@ const SolicitarCambio = () => {
       return;
     }
 
-    const todasLasFechasSonMias = [];
-    let fechaActual = new Date(fechaDesde);
-    const fechaFin = new Date(fechaHasta);
-    
-    while (fechaActual <= fechaFin) {
-      const fechaStr = `${fechaActual.getFullYear()}-${(fechaActual.getMonth() + 1).toString().padStart(2, '0')}-${fechaActual.getDate().toString().padStart(2, '0')}`;
-      if (!diasCustodia.includes(fechaStr)) {
-        alert(`El día ${fechaActual.toLocaleDateString('es-AR')} no es tu día de custodia. Solo puedes solicitar cambio de tus propios días.`);
-        return;
-      }
-      todasLasFechasSonMias.push(fechaStr);
-      fechaActual.setDate(fechaActual.getDate() + 1);
-    }
-
     setEnviando(true);
     
     try {
@@ -137,6 +127,7 @@ const SolicitarCambio = () => {
         hijoId: hijo.id,
         fechaDesde,
         fechaHasta,
+        tipoSolicitud: 'CAMBIO',
         motivo: 'Solicitud de cambio de custodia'
       });
       
@@ -205,7 +196,10 @@ const SolicitarCambio = () => {
           </div>
 
           <p style={{ textAlign: 'center', marginBottom: '16px', color: '#666' }}>
-            ¿Qué días quieres intercambiar?
+            Selecciona cualquier rango de fechas para solicitar el cambio
+          </p>
+          <p style={{ textAlign: 'center', marginBottom: '16px', color: '#999', fontSize: '12px' }}>
+            Puedes seleccionar fechas tuyas o del co-padre
           </p>
 
           <div className="dias-semana-row">
@@ -232,7 +226,7 @@ const SolicitarCambio = () => {
           background: 'white',
           borderRadius: '12px'
         }}>
-          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>¿Qué días necesitas cambiar?</h3>
+          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>¿Qué días quieres cambiar?</h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>

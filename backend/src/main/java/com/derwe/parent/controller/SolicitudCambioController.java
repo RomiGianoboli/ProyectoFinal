@@ -82,4 +82,12 @@ public class SolicitudCambioController {
         List<SolicitudCambioResponseDTO> solicitudes = solicitudCambioService.obtenerSolicitudesPorEstado(padreId, estado);
         return ResponseEntity.ok(solicitudes);
     }
+    
+    @GetMapping("/pendientes")
+    public ResponseEntity<List<SolicitudCambioResponseDTO>> obtenerSolicitudesPendientes(
+            Authentication authentication) {
+        Long padreId = obtenerPadreIdDesdeAutenticacion(authentication);
+        List<SolicitudCambioResponseDTO> solicitudes = solicitudCambioService.obtenerSolicitudesPendientes(padreId);
+        return ResponseEntity.ok(solicitudes);
+    }
 }

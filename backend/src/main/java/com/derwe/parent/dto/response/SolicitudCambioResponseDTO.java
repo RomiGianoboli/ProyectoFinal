@@ -18,6 +18,7 @@ public class SolicitudCambioResponseDTO {
     private LocalDate fechaDesde;
     private LocalDate fechaHasta;
     private String estado;
+    private String tipoSolicitud;
     private String motivo;
     private Long padreSolicitanteId;
     private String nombrePadreSolicitante;

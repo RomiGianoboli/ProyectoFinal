@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { custodiaAPI } from '../services/api';
+import { solicitudAPI, custodiaAPI } from '../services/api';
 import './Calendario.css';
 
 const EstablecerCustodia = () => {
@@ -10,8 +10,9 @@ const EstablecerCustodia = () => {
   
   const [hijo, setHijo] = useState(null);
   const [fechaActual, setFechaActual] = useState(new Date());
-  const [diasSeleccionados, setDiasSeleccionados] = useState([]);
-  const [custodias, setCustodias] = useState([]);
+  const [fechaDesde, setFechaDesde] = useState('');
+  const [fechaHasta, setFechaHasta] = useState('');
+  const [fechasOcupadas, setFechasOcupadas] = useState([]);
   const [guardando, setGuardando] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -38,11 +39,13 @@ const EstablecerCustodia = () => {
       const mes = fechaActual.getMonth() + 1;
       
       const response = await custodiaAPI.porMes(hijo.id, anio, mes);
-      const misCustodias = response.data.filter(c => c.esMiCustodia && (c.estado === 'PENDIENTE' || c.estado === 'CONFIRMADA'));
+      const custodiasConfirmadas = response.data.filter(c => c.estado === 'CONFIRMADA');
       
-      const fechas = misCustodias.map(c => c.fecha);
-      setDiasSeleccionados(fechas);
-      setCustodias(response.data);
+      setFechasOcupadas(custodiasConfirmadas.map(c => ({
+        fecha: c.fecha,
+        color: c.colorPadreResponsable,
+        esMia: c.esMiCustodia
+      })));
     } catch (error) {
       console.error('Error al cargar custodias:', error);
     } finally {
@@ -62,22 +65,6 @@ const EstablecerCustodia = () => {
     setFechaActual(nuevaFecha);
   };
 
-  const toggleDia = (dia) => {
-    if (dia.vacio || !dia.numero) return;
-    
-    const anio = fechaActual.getFullYear();
-    const mes = fechaActual.getMonth() + 1;
-    const fecha = `${anio}-${mes.toString().padStart(2, '0')}-${dia.numero.toString().padStart(2, '0')}`;
-    
-    setDiasSeleccionados(prev => {
-      if (prev.includes(fecha)) {
-        return prev.filter(f => f !== fecha);
-      } else {
-        return [...prev, fecha];
-      }
-    });
-  };
-
   const getDiasDelMes = () => {
     const anio = fechaActual.getFullYear();
     const mes = fechaActual.getMonth();
@@ -95,9 +82,16 @@ const EstablecerCustodia = () => {
     }
     
     for (let dia = 1; dia <= totalDias; dia++) {
+      const fecha = `${anio}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
+      const ocupada = fechasOcupadas.find(f => f.fecha === fecha);
+      
       dias.push({
         numero: dia,
-        vacio: false
+        vacio: false,
+        fecha,
+        ocupada: !!ocupada,
+        color: ocupada?.color,
+        esMia: ocupada?.esMia
       });
     }
     
@@ -107,31 +101,61 @@ const EstablecerCustodia = () => {
   const getDiaClase = (dia) => {
     if (dia.vacio || !dia.numero) return 'dia-celda vacio';
     
-    const anio = fechaActual.getFullYear();
-    const mes = fechaActual.getMonth() + 1;
-    const fecha = `${anio}-${mes.toString().padStart(2, '0')}-${dia.numero.toString().padStart(2, '0')}`;
+    const enRango = fechaDesde && fechaHasta && 
+                    dia.fecha >= fechaDesde && 
+                    dia.fecha <= fechaHasta;
     
-    const seleccionado = diasSeleccionados.includes(fecha);
-    const colorClase = hijo?.colorPadre === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
+    if (dia.ocupada) {
+      const colorClase = dia.color === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
+      return `dia-celda ${colorClase} ocupado`;
+    }
     
-    return `dia-celda ${seleccionado ? colorClase : ''}`;
+    if (enRango) {
+      const miColorClase = hijo?.colorPadre === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
+      return `dia-celda ${miColorClase} seleccionado`;
+    }
+    
+    return 'dia-celda';
   };
 
   const handleGuardar = async () => {
-    if (diasSeleccionados.length === 0) {
-      alert('Debes seleccionar al menos un día');
+    if (!fechaDesde || !fechaHasta) {
+      alert('Debes seleccionar las fechas desde y hasta');
       return;
+    }
+
+    if (new Date(fechaHasta) < new Date(fechaDesde)) {
+      alert('La fecha hasta debe ser posterior a la fecha desde');
+      return;
+    }
+
+    let fecha = new Date(fechaDesde);
+    const fin = new Date(fechaHasta);
+    
+    while (fecha <= fin) {
+      const fechaStr = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getDate().toString().padStart(2, '0')}`;
+      const ocupada = fechasOcupadas.find(f => f.fecha === fechaStr);
+      
+      if (ocupada) {
+        alert(`El día ${fecha.toLocaleDateString('es-AR')} ya está ocupado. En "Establecer custodia" no puedes seleccionar fechas ya asignadas.`);
+        return;
+      }
+      
+      fecha.setDate(fecha.getDate() + 1);
     }
 
     setGuardando(true);
     
     try {
-      await custodiaAPI.establecer({
+      await solicitudAPI.crear({
         hijoId: hijo.id,
-        fechas: diasSeleccionados
+        fechaDesde,
+        fechaHasta,
+        tipoSolicitud: 'ESTABLECER',
+        motivo: 'Establecer fechas de custodia'
       });
       
-      alert('Fechas enviadas. Esperando confirmación del co-padre');
+      alert('Solicitud enviada. Esperando confirmación del co-padre');
       navigate('/calendario', { state: { hijo } });
     } catch (error) {
       console.error('Error al establecer fechas:', error);
@@ -196,7 +220,10 @@ const EstablecerCustodia = () => {
           </div>
 
           <p style={{ textAlign: 'center', marginBottom: '16px', color: '#666' }}>
-            ¿Qué días quieres establecer como tuyos?
+            Selecciona el rango de fechas que deseas establecer
+          </p>
+          <p style={{ textAlign: 'center', marginBottom: '16px', color: '#999', fontSize: '12px' }}>
+            Los días con color ya están ocupados
           </p>
 
           <div className="dias-semana-row">
@@ -210,12 +237,59 @@ const EstablecerCustodia = () => {
               <div
                 key={index}
                 className={getDiaClase(dia)}
-                onClick={() => toggleDia(dia)}
-                style={{ cursor: dia.vacio ? 'default' : 'pointer' }}
+                style={{ 
+                  cursor: dia.vacio || dia.ocupada ? 'default' : 'pointer',
+                  opacity: dia.ocupada ? 0.7 : 1
+                }}
               >
                 {dia.vacio ? '' : dia.numero}
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="seleccion-fechas" style={{ 
+          margin: '20px 0',
+          padding: '16px',
+          background: 'white',
+          borderRadius: '12px'
+        }}>
+          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Selecciona el rango de fechas</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>
+                Desde
+              </label>
+              <input 
+                type="date" 
+                value={fechaDesde}
+                onChange={(e) => setFechaDesde(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e5e5',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>
+                Hasta
+              </label>
+              <input 
+                type="date" 
+                value={fechaHasta}
+                onChange={(e) => setFechaHasta(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e5e5',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -229,9 +303,9 @@ const EstablecerCustodia = () => {
           <button 
             className="btn-accion-primary" 
             onClick={handleGuardar}
-            disabled={guardando || diasSeleccionados.length === 0}
+            disabled={guardando || !fechaDesde || !fechaHasta}
           >
-            {guardando ? 'Guardando...' : `Establecer (${diasSeleccionados.length} días)`}
+            {guardando ? 'Enviando...' : 'Solicitar fechas'}
           </button>
         </div>
       </div>
