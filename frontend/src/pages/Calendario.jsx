@@ -152,7 +152,7 @@ const Calendario = () => {
     
     for (let dia = 1; dia <= totalDias; dia++) {
       const diaData = calendario?.dias?.find(d => {
-        const fecha = new Date(d.fecha);
+        const fecha = new Date(d.fecha + 'T00:00:00');
         return fecha.getDate() === dia;
       });
       
