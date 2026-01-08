@@ -142,7 +142,8 @@ const AprobarRechazarCambio = () => {
     if (dia.vacio || !dia.numero) return 'dia-celda vacio';
     
     if (dia.enRango) {
-      return 'dia-celda custodia-lila';
+      const colorClase = solicitud?.colorSolicitante === 'CELESTE' ? 'custodia-celeste' : 'custodia-lila';
+      return `dia-celda ${colorClase}`;
     }
     
     return 'dia-celda';
@@ -224,13 +225,13 @@ const AprobarRechazarCambio = () => {
             border: '2px solid #ff9b71'
           }}>
             <p style={{ fontWeight: '600', marginBottom: '8px', color: '#1f2937', fontSize: '16px' }}>
-              {solicitud.nombreSolicitante || 'El co-padre'} solicita estas fechas de custodia:
+              <strong>{solicitud.nombrePadreSolicitante}</strong> solicita estas fechas de custodia:
             </p>
             <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#ff9b71', marginBottom: '8px' }}>
               Del {formatearFecha(solicitud.fechaDesde)} al {formatearFecha(solicitud.fechaHasta)}
             </p>
             <p style={{ fontSize: '14px', color: '#666' }}>
-              Los días resaltados en morado serían asignados
+              Los días resaltados en {solicitud.colorSolicitante === 'CELESTE' ? 'celeste' : 'morado'} serían asignados
             </p>
           </div>
 

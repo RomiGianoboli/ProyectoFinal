@@ -243,6 +243,15 @@ public class SolicitudCambioService {
             solicitud.getPadreReceptor().getNombre() + " " +
             solicitud.getPadreReceptor().getApellido()
         );
+        
+        // Obtener el color del padre solicitante
+        relacionRepository.findByPadreIdAndHijoId(
+            solicitud.getPadreSolicitante().getId(), 
+            solicitud.getHijo().getId()
+        ).ifPresent(relacion -> {
+            dto.setColorSolicitante(relacion.getColorAsignado());
+        });
+        
         dto.setFechaSolicitud(solicitud.getFechaSolicitud());
         dto.setFechaResolucion(solicitud.getFechaResolucion());
         return dto;

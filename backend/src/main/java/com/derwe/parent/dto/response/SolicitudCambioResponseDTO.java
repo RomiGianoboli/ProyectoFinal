@@ -24,6 +24,7 @@ public class SolicitudCambioResponseDTO {
     private String nombrePadreSolicitante;
     private Long padreReceptorId;
     private String nombrePadreReceptor;
+    private String colorSolicitante;
     private LocalDateTime fechaSolicitud;
     private LocalDateTime fechaResolucion;
 }
