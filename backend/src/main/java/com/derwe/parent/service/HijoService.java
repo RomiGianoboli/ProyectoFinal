@@ -138,12 +138,28 @@ public class HijoService {
         RelacionPadreHijo relacionPadre = relacionRepository.findByPadreIdAndHijoId(padreId, hijoId)
                 .orElseThrow(() -> new RuntimeException("No tienes acceso a este hijo"));
         
-        // Verificar que el color aún no ha sido seleccionado (no se puede cambiar)
-        if (relacionPadre.getColorAsignado() != null) {
-            throw new RuntimeException("El color ya fue seleccionado y no se puede cambiar");
+        // Obtener todas las relaciones para este hijo
+        List<RelacionPadreHijo> todasRelaciones = relacionRepository.findByHijoId(hijoId);
+        
+        // Verificar si CUALQUIER padre ya tiene color asignado (no solo el que llama)
+        for (RelacionPadreHijo relacion : todasRelaciones) {
+            if (relacion.getColorAsignado() != null) {
+                // Ya hay un color asignado - no se puede cambiar
+                if (relacion.getPadre().getId().equals(padreId)) {
+                    throw new RuntimeException("El color ya fue seleccionado y no se puede cambiar");
+                } else {
+                    // El co-padre ya eligió, este padre tiene el color opuesto automáticamente
+                    String colorAsignadoAutomatico = "LILA".equals(relacion.getColorAsignado()) ? "CELESTE" : "LILA";
+                    if (relacionPadre.getColorAsignado() == null) {
+                        relacionPadre.setColorAsignado(colorAsignadoAutomatico);
+                        relacionRepository.save(relacionPadre);
+                    }
+                    throw new RuntimeException("El co-padre ya seleccionó color. Tu color asignado es: " + relacionPadre.getColorAsignado());
+                }
+            }
         }
         
-        // Asignar el color elegido al padre
+        // Ningún padre tiene color aún - asignar el elegido
         relacionPadre.setColorAsignado(colorElegido);
         relacionRepository.save(relacionPadre);
         
@@ -151,7 +167,6 @@ public class HijoService {
         String colorOpuesto = "LILA".equals(colorElegido) ? "CELESTE" : "LILA";
         
         // Buscar al co-padre y asignarle el color opuesto automáticamente
-        List<RelacionPadreHijo> todasRelaciones = relacionRepository.findByHijoId(hijoId);
         String colorCoPadre = null;
         
         for (RelacionPadreHijo relacion : todasRelaciones) {
