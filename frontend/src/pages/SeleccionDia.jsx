@@ -10,6 +10,7 @@ const SeleccionDia = () => {
   
   const [actividades, setActividades] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actividadSeleccionada, setActividadSeleccionada] = useState(null);
 
   useEffect(() => {
     if (!fecha || !hijo) {
@@ -108,8 +109,20 @@ const SeleccionDia = () => {
               <p className="no-actividades">No hay actividades programadas</p>
             ) : (
               actividades.map((actividad) => (
-                <div key={actividad.id} className="actividad-item">
+                <div 
+                  key={actividad.id} 
+                  className={`actividad-item ${actividadSeleccionada?.id === actividad.id ? 'actividad-seleccionada' : ''}`}
+                  onClick={() => setActividadSeleccionada(actividad)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="actividad-info">
+                    <input
+                      type="radio"
+                      name="actividad"
+                      checked={actividadSeleccionada?.id === actividad.id}
+                      onChange={() => setActividadSeleccionada(actividad)}
+                      style={{ marginRight: '10px', accentColor: '#ff9b71' }}
+                    />
                     <span className="actividad-circulo" style={{
                       backgroundColor: actividad.colorPadre === 'LILA' ? '#d8b4fe' : '#7dd3fc'
                     }}></span>
@@ -132,11 +145,21 @@ const SeleccionDia = () => {
             </button>
             {actividades.length > 0 && (
               <>
-                <button className="accion-actividad-btn" onClick={() => actividades.length > 0 && handleEditarActividad(actividades[0])}>
+                <button 
+                  className="accion-actividad-btn" 
+                  onClick={() => actividadSeleccionada && handleEditarActividad(actividadSeleccionada)}
+                  disabled={!actividadSeleccionada}
+                  style={{ opacity: actividadSeleccionada ? 1 : 0.5 }}
+                >
                   <span className="icono-accion">✏️</span>
                   <span>Editar actividad</span>
                 </button>
-                <button className="accion-actividad-btn" onClick={() => actividades.length > 0 && handleEliminarActividad(actividades[0])}>
+                <button 
+                  className="accion-actividad-btn" 
+                  onClick={() => actividadSeleccionada && handleEliminarActividad(actividadSeleccionada)}
+                  disabled={!actividadSeleccionada}
+                  style={{ opacity: actividadSeleccionada ? 1 : 0.5 }}
+                >
                   <span className="icono-accion">🗑️</span>
                   <span>Eliminar actividad</span>
                 </button>
