@@ -73,6 +73,85 @@ Todo esto sucede en fracciones de segundo, dando la sensación de que la aplicac
 
 La aplicación usa **JWT (JSON Web Tokens)** para la seguridad. Es como un pase VIP digital: cuando el usuario inicia sesión correctamente, recibe este token. Cada vez que hace algo en la app, envía el token junto con su pedido. El servidor verifica que el token sea válido y que pertenezca a ese usuario antes de hacer cualquier cosa. Así nadie puede ver o modificar datos de otros usuarios.
 
+### Cómo Están Conectadas las Capas
+
+La aplicación tiene tres capas que se comunican entre sí de forma ordenada:
+
+```
+┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
+│    FRONTEND     │  ────►  │    BACKEND      │  ────►  │  BASE DE DATOS  │
+│     (React)     │  ◄────  │  (Spring Boot)  │  ◄────  │  (PostgreSQL)   │
+└─────────────────┘         └─────────────────┘         └─────────────────┘
+     Puerto 5000                Puerto 8080
+```
+
+**Conexión Frontend → Backend:**
+- El frontend usa una librería llamada **Axios** para enviar peticiones HTTP al backend
+- Todas las peticiones van al puerto 8080 donde escucha el servidor Spring Boot
+- Los datos viajan en formato **JSON** (JavaScript Object Notation), que es texto estructurado
+- Cada petición incluye el **token JWT** en el encabezado para identificar al usuario
+- El archivo `api.js` centraliza todas las llamadas al backend
+
+**Conexión Backend → Base de Datos:**
+- El backend usa **Spring Data JPA** con **Hibernate** como ORM (Object-Relational Mapping)
+- El ORM traduce objetos Java a tablas de base de datos automáticamente
+- La conexión se hace mediante **JDBC** (Java Database Connectivity)
+- Las credenciales de conexión se guardan en variables de entorno por seguridad
+
+### Tecnologías Utilizadas y Por Qué
+
+#### Frontend (Lo que ve el usuario)
+
+| Tecnología | Para qué se usa |
+|------------|-----------------|
+| **React 18.2** | Crear la interfaz de usuario con componentes reutilizables. Cada pantalla (calendario, formularios, listas) es un componente React. |
+| **React Router 6.20** | Manejar la navegación entre pantallas sin recargar la página. Permite ir de Login a Home a Calendario fluidamente. |
+| **Axios 1.6.2** | Enviar y recibir datos del servidor. Es más fácil de usar que fetch nativo y permite interceptar todas las peticiones. |
+| **Vite 5.0.8** | Compilar y servir la aplicación. Es mucho más rápido que alternativas como Webpack. |
+| **vite-plugin-pwa** | Convertir la web en una PWA instalable con soporte offline y notificaciones. |
+| **CSS puro** | Estilos visuales. Se optó por CSS puro sin frameworks para tener control total del diseño Figma. |
+
+#### Backend (El cerebro)
+
+| Tecnología | Para qué se usa |
+|------------|-----------------|
+| **Java 17** | Lenguaje de programación robusto y muy usado en aplicaciones empresariales. |
+| **Spring Boot 3.2** | Framework que simplifica crear aplicaciones Java. Configura automáticamente muchas cosas. |
+| **Spring Web** | Crear los endpoints REST (las URLs que reciben peticiones del frontend). |
+| **Spring Security** | Manejar la autenticación y autorización. Protege los endpoints para que solo usuarios autorizados accedan. |
+| **Spring Data JPA** | Simplificar el acceso a base de datos. Con solo definir interfaces, genera automáticamente las consultas SQL. |
+| **JJWT 0.11.5** | Generar y validar tokens JWT para la autenticación segura. |
+| **Lombok** | Reducir código repetitivo en Java (getters, setters, constructores). |
+| **Maven** | Gestionar dependencias y compilar el proyecto. |
+
+#### Base de Datos (La memoria)
+
+| Tecnología | Para qué se usa |
+|------------|-----------------|
+| **PostgreSQL** | Base de datos relacional robusta y gratuita. Guarda todos los datos de forma permanente. |
+| **Hibernate** | ORM que traduce objetos Java a tablas SQL. Evita escribir SQL manualmente. |
+
+### Flujo de una Petición Completa (Ejemplo: Crear Actividad)
+
+1. **Usuario** toca "Guardar" en el formulario de nueva actividad
+2. **React** captura los datos y llama a `actividadAPI.crear(datos)`
+3. **Axios** envía POST a `http://servidor:8080/api/actividades` con:
+   - Body: `{ hijoId: 1, titulo: "Dentista", fecha: "2026-01-20", ... }`
+   - Header: `Authorization: Bearer eyJhbGciOiJIUz...` (el token JWT)
+4. **Spring Security** intercepta la petición y valida el token
+5. **ActividadController** recibe la petición y llama al servicio
+6. **ActividadService** aplica la lógica de negocio:
+   - Verifica que el padre tenga permiso sobre ese hijo
+   - Crea el objeto Actividad
+   - Busca al co-padre para notificarlo
+7. **ActividadRepository** guarda la actividad en PostgreSQL
+8. **NotificacionService** crea una notificación para el co-padre
+9. **Spring** devuelve respuesta 200 OK con los datos de la actividad creada
+10. **Axios** recibe la respuesta y la pasa al componente React
+11. **React** actualiza la pantalla mostrando la nueva actividad
+
+Todo esto ocurre en menos de un segundo.
+
 ---
 
 ## Arquitectura General del Sistema
