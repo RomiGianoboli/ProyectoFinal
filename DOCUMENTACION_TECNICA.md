@@ -11,6 +11,70 @@
 
 ---
 
+## Cómo Funciona DerWeParent - Explicación General
+
+### ¿Qué es DerWeParent?
+
+DerWeParent es una aplicación web diseñada para facilitar la coordinación entre padres separados o divorciados. Imagina dos padres que comparten la custodia de sus hijos: cada uno necesita saber cuándo le toca cuidar a los niños, qué actividades tienen programadas, y poder comunicarse sobre cambios en el calendario. Esta aplicación resuelve exactamente ese problema.
+
+### ¿Cómo está construida?
+
+La aplicación funciona como una **página web especial** que se puede instalar en el celular como si fuera una app nativa. Esto se llama PWA (Progressive Web Application). La ventaja es que no necesita descargarse desde una tienda de aplicaciones, simplemente se accede desde el navegador y se puede agregar a la pantalla de inicio.
+
+El sistema tiene **tres partes principales** que trabajan juntas:
+
+1. **Lo que ve el usuario (Frontend):** Es la interfaz visual, los botones, los calendarios, los formularios. Está hecho con React, una herramienta muy popular para crear interfaces web interactivas. Cuando el usuario toca un botón o llena un formulario, esta parte se encarga de mostrarlo bonito y enviar la información al servidor.
+
+2. **El cerebro de la aplicación (Backend):** Es el servidor que procesa toda la lógica. Cuando un padre crea una actividad, el servidor la guarda, verifica que tenga permiso para hacerlo, y notifica al otro padre. Está hecho con Spring Boot, un framework de Java muy usado en aplicaciones empresariales.
+
+3. **La memoria de la aplicación (Base de Datos):** Es donde se guardan todos los datos: los usuarios, los hijos, las actividades, las fechas de custodia, las notificaciones. Usa PostgreSQL, una base de datos robusta y confiable.
+
+### El Flujo de Uso Típico
+
+#### Paso 1: Registro e Inicio de Sesión
+Un padre se registra con su email y contraseña. El sistema crea su cuenta y le da un "token" (como una llave digital) que usa para identificarse en cada acción.
+
+#### Paso 2: Agregar Hijos
+El padre registra a sus hijos en el sistema. Cada hijo tiene un nombre y una fecha de nacimiento.
+
+#### Paso 3: Invitar al Co-Padre
+El padre invita al otro padre por email. Cuando el co-padre acepta la invitación, queda vinculado al mismo hijo y pueden empezar a coordinar.
+
+#### Paso 4: Selección de Colores
+Cada padre elige un color que lo identificará en el calendario: **lila (violeta claro)** o **celeste (azul claro)**. El primero que elige se queda con su color preferido, el segundo recibe el que queda. Estos colores son permanentes y ayudan a identificar visualmente quién tiene la custodia cada día.
+
+#### Paso 5: Establecer Fechas de Custodia
+Los padres pueden solicitar fechas de custodia. Hay dos tipos de solicitudes:
+- **ESTABLECER:** Para pedir fechas que todavía nadie tiene asignadas.
+- **CAMBIO:** Para solicitar modificar fechas que ya están asignadas (incluso las del otro padre).
+
+Cuando un padre hace una solicitud, el otro recibe una notificación y puede aprobarla o rechazarla.
+
+#### Paso 6: Calendario Compartido
+Ambos padres ven el mismo calendario con los días coloreados según quién tiene la custodia. También pueden agregar actividades (médico, escuela, cumpleaños) que ambos pueden ver.
+
+#### Paso 7: Notificaciones
+Cada vez que algo importante pasa (nueva actividad, solicitud de cambio, aprobación), el padre correspondiente recibe una notificación. Hay un icono de campana que muestra cuántas notificaciones sin leer tiene.
+
+### La Comunicación Entre Partes
+
+Cuando el usuario hace algo en la pantalla (por ejemplo, crear una actividad), sucede lo siguiente:
+
+1. **El Frontend** recoge los datos del formulario
+2. **Los envía al Backend** como un mensaje en formato JSON (un formato de texto estructurado)
+3. **El Backend** recibe el mensaje, verifica que el usuario esté autorizado, procesa la lógica (crear la actividad, notificar al co-padre)
+4. **Guarda los datos** en la Base de Datos
+5. **Responde al Frontend** con el resultado (éxito o error)
+6. **El Frontend** muestra el resultado al usuario
+
+Todo esto sucede en fracciones de segundo, dando la sensación de que la aplicación responde instantáneamente.
+
+### Seguridad
+
+La aplicación usa **JWT (JSON Web Tokens)** para la seguridad. Es como un pase VIP digital: cuando el usuario inicia sesión correctamente, recibe este token. Cada vez que hace algo en la app, envía el token junto con su pedido. El servidor verifica que el token sea válido y que pertenezca a ese usuario antes de hacer cualquier cosa. Así nadie puede ver o modificar datos de otros usuarios.
+
+---
+
 ## Arquitectura General del Sistema
 
 ```
