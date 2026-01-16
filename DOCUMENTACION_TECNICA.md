@@ -1,0 +1,796 @@
+# DerWeParent - Documentación Técnica Completa
+
+## Información General del Proyecto
+
+**Nombre del Proyecto:** DerWeParent ("We Parent")  
+**Tipo de Aplicación:** Progressive Web Application (PWA)  
+**Propósito:** Sistema de coordinación parental para gestión de actividades, calendarios de custodia y comunicación entre co-padres  
+**Universidad:** Universidad Siglo 21  
+**Trabajo Final de Grado:** Ingeniería en Software  
+**Autora:** Romina Gianoboli
+
+---
+
+## Arquitectura General del Sistema
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        USUARIO (Navegador)                       │
+│                    PWA - Progressive Web App                     │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 │ HTTP/HTTPS (Puerto 5000)
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         FRONTEND                                 │
+│              React 18.2 + Vite 5.0 + React Router 6             │
+│                        (Puerto 5000)                             │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 │ REST API + JWT (Puerto 8080)
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         BACKEND                                  │
+│                 Spring Boot 3.2 + Spring Security               │
+│                        (Puerto 8080)                             │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 │ JDBC + JPA/Hibernate
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      BASE DE DATOS                               │
+│                        PostgreSQL                                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+# FRONTEND
+
+## Tecnologías Utilizadas
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| React | 18.2.0 | Librería de componentes UI |
+| React DOM | 18.2.0 | Renderizado de componentes |
+| React Router DOM | 6.20.0 | Enrutamiento y navegación |
+| Axios | 1.6.2 | Cliente HTTP para API calls |
+| Vite | 5.0.8 | Build tool y servidor de desarrollo |
+| vite-plugin-pwa | 0.17.4 | Generación de Service Worker y manifest |
+| @vitejs/plugin-react | 4.2.1 | Plugin React para Vite |
+
+## Estructura de Carpetas del Frontend
+
+```
+frontend/
+├── public/                      # Archivos estáticos públicos
+│   ├── icons/                   # Iconos PWA (192x192, 512x512)
+│   ├── favicon.ico              # Favicon del sitio
+│   └── apple-touch-icon.png     # Icono para iOS
+│
+├── src/                         # Código fuente
+│   ├── context/                 # Contextos de React
+│   │   └── AuthContext.jsx      # Contexto de autenticación global
+│   │
+│   ├── pages/                   # Páginas/Vistas de la aplicación
+│   │   ├── Login.jsx            # Página de inicio de sesión
+│   │   ├── Registro.jsx         # Página de registro de usuarios
+│   │   ├── Home.jsx             # Página principal (lista de hijos)
+│   │   ├── ListaHijos.jsx       # Lista de hijos del padre
+│   │   ├── AgregarHijo.jsx      # Formulario para agregar hijo
+│   │   ├── HomeHijoSeleccionado.jsx  # Home después de seleccionar hijo
+│   │   ├── Calendario.jsx       # Calendario mensual con custodias
+│   │   ├── SeleccionDia.jsx     # Vista de actividades de un día
+│   │   ├── Actividades.jsx      # Lista de actividades
+│   │   ├── AgregarActividad.jsx # Formulario nueva actividad
+│   │   ├── EditarActividad.jsx  # Formulario editar actividad
+│   │   ├── EliminarActividad.jsx # Confirmación eliminar actividad
+│   │   ├── Custodias.jsx        # Gestión de custodias
+│   │   ├── EstablecerCustodia.jsx    # Establecer fechas de custodia
+│   │   ├── SolicitarCambio.jsx       # Solicitar cambio de custodia
+│   │   ├── AprobarRechazarCambio.jsx # Aprobar/rechazar solicitudes
+│   │   ├── Notificaciones.jsx   # Lista de notificaciones
+│   │   ├── Invitacion.jsx       # Aceptar invitación de co-padre
+│   │   └── *.css                # Estilos CSS de cada página
+│   │
+│   ├── services/                # Servicios y API
+│   │   └── api.js               # Configuración Axios y endpoints
+│   │
+│   ├── App.jsx                  # Componente raíz con rutas
+│   ├── App.css                  # Estilos globales
+│   ├── main.jsx                 # Punto de entrada de React
+│   └── index.css                # Estilos base
+│
+├── index.html                   # HTML principal
+├── vite.config.js               # Configuración de Vite y PWA
+└── package.json                 # Dependencias y scripts
+```
+
+## Conexión Frontend - Backend
+
+### Archivo: `src/services/api.js`
+
+Este archivo centraliza TODA la comunicación con el backend.
+
+#### Configuración de Axios
+
+```javascript
+const API_URL = import.meta.env.VITE_API_URL || '/api';
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' }
+});
+```
+
+#### Interceptores
+
+**Request Interceptor:** Agrega automáticamente el token JWT a cada petición:
+```javascript
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
+
+**Response Interceptor:** Maneja errores 401 (no autorizado):
+```javascript
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+### APIs Disponibles en el Frontend
+
+| API | Métodos | Descripción |
+|-----|---------|-------------|
+| `authAPI` | register, login, validate | Autenticación de usuarios |
+| `hijoAPI` | crear, misHijos, vincular, seleccionarColor | Gestión de hijos |
+| `actividadAPI` | crear, editar, eliminar, porFecha, porMes | Gestión de actividades |
+| `custodiaAPI` | establecer, porHijo, porMes | Gestión de fechas de custodia |
+| `calendarioAPI` | mesCompleto | Calendario con actividades y custodias |
+| `notificacionAPI` | misNotificaciones, noLeidas, marcarLeida, etc. | Notificaciones |
+| `invitacionAPI` | enviar, aceptar, enviadas, recibidas | Invitaciones a co-padres |
+| `solicitudAPI` | crear, aprobar, rechazar, enviadas, recibidas, pendientes | Solicitudes de cambio |
+
+### Detalle de Endpoints por API
+
+#### authAPI
+- `POST /auth/register` - Registrar nuevo usuario
+- `POST /auth/login` - Iniciar sesión
+- `GET /auth/validate` - Validar token JWT
+
+#### hijoAPI
+- `POST /hijos` - Crear nuevo hijo
+- `GET /hijos` - Obtener hijos del padre
+- `POST /hijos/vincular` - Vincular padre a hijo existente
+- `PUT /hijos/{id}/seleccionar-color` - Seleccionar color de custodia
+
+#### actividadAPI
+- `POST /actividades` - Crear actividad
+- `PUT /actividades/{id}` - Editar actividad
+- `DELETE /actividades/{id}` - Eliminar actividad
+- `GET /actividades/hijo/{hijoId}/fecha/{fecha}` - Actividades por fecha
+- `GET /actividades/hijo/{hijoId}/mes/{anio}/{mes}` - Actividades del mes
+
+#### custodiaAPI
+- `POST /custodias` - Establecer custodia
+- `GET /custodias/hijo/{hijoId}` - Custodias por hijo
+- `GET /custodias/hijo/{hijoId}/mes/{anio}/{mes}` - Custodias del mes
+
+#### notificacionAPI
+- `GET /notificaciones` - Todas las notificaciones
+- `GET /notificaciones/no-leidas` - Solo no leídas
+- `PUT /notificaciones/{id}/leer` - Marcar como leída
+- `PUT /notificaciones/leer-todas` - Marcar todas como leídas
+- `GET /notificaciones/contador` - Contador de no leídas
+- `DELETE /notificaciones/{id}` - Eliminar notificación
+
+#### solicitudAPI
+- `POST /solicitudes-cambio` - Crear solicitud
+- `PUT /solicitudes-cambio/{id}/aprobar` - Aprobar solicitud
+- `PUT /solicitudes-cambio/{id}/rechazar` - Rechazar solicitud
+- `GET /solicitudes-cambio/enviadas` - Solicitudes enviadas
+- `GET /solicitudes-cambio/recibidas` - Solicitudes recibidas
+- `GET /solicitudes-cambio/pendientes` - Solicitudes pendientes
+
+---
+
+# BACKEND
+
+## Tecnologías Utilizadas
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| Java | 17 | Lenguaje de programación |
+| Spring Boot | 3.2.0 | Framework de aplicación |
+| Spring Web | 3.2.0 | REST Controllers |
+| Spring Data JPA | 3.2.0 | ORM y repositorios |
+| Spring Security | 3.2.0 | Autenticación y autorización |
+| JJWT | 0.11.5 | Generación y validación de JWT |
+| PostgreSQL | - | Base de datos producción |
+| H2 Database | - | Base de datos desarrollo/testing |
+| Lombok | - | Reducción de código boilerplate |
+| Spring Validation | 3.2.0 | Validación de DTOs |
+| Maven | - | Gestión de dependencias |
+
+## Estructura de Carpetas del Backend
+
+```
+backend/
+├── src/main/java/com/derwe/parent/
+│   │
+│   ├── controller/              # Controladores REST (8 archivos)
+│   │   ├── AuthController.java           # /api/auth/*
+│   │   ├── HijoController.java           # /api/hijos/*
+│   │   ├── ActividadController.java      # /api/actividades/*
+│   │   ├── FechaCustodiaController.java  # /api/custodias/*
+│   │   ├── CalendarioController.java     # /api/calendario/*
+│   │   ├── NotificacionController.java   # /api/notificaciones/*
+│   │   ├── InvitacionController.java     # /api/invitaciones/*
+│   │   └── SolicitudCambioController.java # /api/solicitudes-cambio/*
+│   │
+│   ├── service/                 # Servicios de negocio (9 archivos)
+│   │   ├── AuthService.java              # Interface autenticación
+│   │   ├── PadreService.java             # Interface padres
+│   │   ├── HijoService.java              # Lógica de hijos
+│   │   ├── ActividadService.java         # Lógica de actividades
+│   │   ├── FechaCustodiaService.java     # Lógica de custodias
+│   │   ├── CalendarioService.java        # Lógica calendario
+│   │   ├── NotificacionService.java      # Lógica notificaciones
+│   │   ├── InvitacionService.java        # Lógica invitaciones
+│   │   ├── SolicitudCambioService.java   # Lógica solicitudes
+│   │   └── impl/                         # Implementaciones
+│   │       ├── AuthServiceImpl.java
+│   │       └── PadreServiceImpl.java
+│   │
+│   ├── repository/              # Repositorios JPA (8 archivos)
+│   │   ├── PadreRepository.java
+│   │   ├── HijoRepository.java
+│   │   ├── RelacionPadreHijoRepository.java
+│   │   ├── ActividadRepository.java
+│   │   ├── FechaCustodiaRepository.java
+│   │   ├── NotificacionRepository.java
+│   │   ├── InvitacionRepository.java
+│   │   └── SolicitudCambioRepository.java
+│   │
+│   ├── model/                   # Entidades JPA (12 archivos)
+│   │   ├── Padre.java                    # Entidad usuario/padre
+│   │   ├── Hijo.java                     # Entidad hijo
+│   │   ├── RelacionPadreHijo.java        # Relación N:N padre-hijo
+│   │   ├── Actividad.java                # Entidad actividad
+│   │   ├── FechaCustodia.java            # Entidad fecha custodia
+│   │   ├── Notificacion.java             # Entidad notificación
+│   │   ├── Invitacion.java               # Entidad invitación
+│   │   ├── SolicitudCambio.java          # Entidad solicitud
+│   │   ├── EstadoActividad.java          # Enum estados actividad
+│   │   ├── EstadoInvitacion.java         # Enum estados invitación
+│   │   ├── EstadoCustodia.java           # Enum estados custodia
+│   │   ├── EstadoSolicitud.java          # Enum estados solicitud
+│   │   ├── TipoNotificacion.java         # Enum tipos notificación
+│   │   └── TipoSolicitudCustodia.java    # Enum tipos solicitud
+│   │
+│   ├── dto/                     # Data Transfer Objects (17 archivos)
+│   │   ├── request/                      # DTOs de entrada
+│   │   │   ├── PadreRequestDTO.java
+│   │   │   ├── LoginRequestDTO.java
+│   │   │   ├── HijoRequestDTO.java
+│   │   │   ├── ActividadRequestDTO.java
+│   │   │   ├── FechaCustodiaRequestDTO.java
+│   │   │   ├── InvitacionRequestDTO.java
+│   │   │   ├── SeleccionColorRequestDTO.java
+│   │   │   └── SolicitudCambioRequestDTO.java
+│   │   │
+│   │   └── response/                     # DTOs de salida
+│   │       ├── PadreResponseDTO.java
+│   │       ├── LoginResponseDTO.java
+│   │       ├── HijoResponseDTO.java
+│   │       ├── ActividadResponseDTO.java
+│   │       ├── FechaCustodiaResponseDTO.java
+│   │       ├── NotificacionResponseDTO.java
+│   │       ├── InvitacionResponseDTO.java
+│   │       ├── CalendarioResponseDTO.java
+│   │       ├── SeleccionColorResponseDTO.java
+│   │       ├── SolicitudCambioResponseDTO.java
+│   │       └── ApiResponseDTO.java
+│   │
+│   ├── config/                  # Configuración (4 archivos)
+│   │   ├── SecurityConfig.java           # Configuración Spring Security
+│   │   ├── JwtAuthenticationFilter.java  # Filtro JWT
+│   │   ├── JwtUtil.java                  # Utilidades JWT
+│   │   └── CustomUserDetailsService.java # Carga de usuarios
+│   │
+│   ├── exception/               # Excepciones personalizadas (5 archivos)
+│   │   ├── GlobalExceptionHandler.java   # Manejador global
+│   │   ├── DuplicateEmailException.java
+│   │   ├── InvalidCredentialsException.java
+│   │   ├── AccountDeactivatedException.java
+│   │   └── ResourceNotFoundException.java
+│   │
+│   └── DerWeParentApplication.java  # Clase principal Spring Boot
+│
+├── src/main/resources/
+│   └── application.properties   # Configuración de la aplicación
+│
+└── pom.xml                      # Dependencias Maven
+```
+
+## Patrón de Arquitectura: MVC en Capas
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                    CONTROLLER (Capa de Presentación)          │
+│  Recibe peticiones HTTP, valida entrada, retorna respuestas   │
+│  Archivos: *Controller.java                                   │
+└──────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    SERVICE (Capa de Negocio)                  │
+│  Contiene la lógica de negocio, validaciones, reglas          │
+│  Archivos: *Service.java                                      │
+└──────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────┐
+│                   REPOSITORY (Capa de Datos)                  │
+│  Acceso a base de datos mediante Spring Data JPA              │
+│  Archivos: *Repository.java                                   │
+└──────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────┐
+│                   MODEL (Entidades JPA)                       │
+│  Mapeo objeto-relacional con la base de datos                 │
+│  Archivos: Padre.java, Hijo.java, Actividad.java, etc.        │
+└──────────────────────────────────────────────────────────────┘
+```
+
+## Detalle de Controladores (APIs REST)
+
+### AuthController.java
+**Base URL:** `/api/auth`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/register` | Registra nuevo padre |
+| POST | `/login` | Inicia sesión, retorna JWT |
+| GET | `/validate` | Valida token JWT actual |
+
+### HijoController.java
+**Base URL:** `/api/hijos`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/` | Crea nuevo hijo |
+| GET | `/` | Lista hijos del padre autenticado |
+| POST | `/vincular` | Vincula padre a hijo existente |
+| PUT | `/{id}/seleccionar-color` | Selecciona color de custodia (LILA/CELESTE) |
+
+### ActividadController.java
+**Base URL:** `/api/actividades`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/` | Crea nueva actividad |
+| PUT | `/{id}` | Edita actividad existente |
+| DELETE | `/{id}` | Elimina actividad |
+| GET | `/hijo/{hijoId}/fecha/{fecha}` | Actividades de un día |
+| GET | `/hijo/{hijoId}/mes/{anio}/{mes}` | Actividades del mes |
+
+### FechaCustodiaController.java
+**Base URL:** `/api/custodias`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/` | Establece fecha de custodia |
+| GET | `/hijo/{hijoId}` | Todas las custodias de un hijo |
+| GET | `/hijo/{hijoId}/mes/{anio}/{mes}` | Custodias del mes |
+
+### CalendarioController.java
+**Base URL:** `/api/calendario`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/hijo/{hijoId}/mes/{anio}/{mes}` | Calendario completo del mes |
+
+### NotificacionController.java
+**Base URL:** `/api/notificaciones`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| GET | `/` | Todas las notificaciones |
+| GET | `/no-leidas` | Solo notificaciones no leídas |
+| PUT | `/{id}/leer` | Marca como leída |
+| PUT | `/leer-todas` | Marca todas como leídas |
+| GET | `/contador` | Cuenta de no leídas |
+| DELETE | `/{id}` | Elimina notificación |
+
+### InvitacionController.java
+**Base URL:** `/api/invitaciones`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/` | Envía invitación a co-padre |
+| POST | `/{token}/aceptar` | Acepta invitación |
+| GET | `/enviadas` | Invitaciones enviadas |
+| GET | `/recibidas` | Invitaciones recibidas |
+
+### SolicitudCambioController.java
+**Base URL:** `/api/solicitudes-cambio`
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/` | Crea solicitud de cambio/establecimiento |
+| PUT | `/{id}/aprobar` | Aprueba solicitud |
+| PUT | `/{id}/rechazar` | Rechaza solicitud |
+| GET | `/enviadas` | Solicitudes enviadas |
+| GET | `/recibidas` | Solicitudes recibidas |
+| GET | `/pendientes` | Solicitudes pendientes |
+
+## Detalle de Servicios (Lógica de Negocio)
+
+### HijoService.java
+**Métodos principales:**
+- `crearHijo(HijoRequestDTO, email)` - Crea hijo y relación con padre creador
+- `obtenerHijosDelPadre(email)` - Lista hijos del padre
+- `vincularPadre(token, email)` - Vincula co-padre mediante token de invitación
+- `seleccionarColor(hijoId, color, email)` - Asigna color al padre (inmutable)
+
+### ActividadService.java
+**Métodos principales:**
+- `crearActividad(ActividadRequestDTO, email)` - Crea actividad y notifica co-padre
+- `editarActividad(id, ActividadRequestDTO, email)` - Edita y notifica
+- `eliminarActividad(id, email)` - Elimina y notifica
+- `obtenerPorFecha(hijoId, fecha, email)` - Actividades de un día
+- `obtenerPorMes(hijoId, anio, mes, email)` - Actividades del mes
+
+### SolicitudCambioService.java
+**Métodos principales:**
+- `crearSolicitud(SolicitudCambioRequestDTO, email)` - Crea solicitud y notifica
+- `aprobarSolicitud(id, email)` - Aprueba, crea fechas custodia, notifica
+- `rechazarSolicitud(id, email)` - Rechaza y notifica
+- `obtenerPendientes(email)` - Solicitudes pendientes de aprobar
+
+### NotificacionService.java
+**Métodos principales:**
+- `crearNotificacion(tipo, mensaje, padreDestino, referenciaId)` - Crea notificación
+- `obtenerNoLeidas(email)` - Notificaciones sin leer
+- `marcarComoLeida(id, email)` - Marca una como leída
+- `contadorNoLeidas(email)` - Cuenta para badge
+
+## Conexión Backend - Base de Datos
+
+### Configuración JPA
+La conexión se configura en `application.properties`:
+
+```properties
+spring.datasource.url=${DATABASE_URL}
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+```
+
+### Repositorios (Spring Data JPA)
+Los repositorios extienden `JpaRepository<Entity, ID>` y proveen:
+- Métodos CRUD automáticos
+- Queries personalizados con `@Query`
+- Métodos derivados del nombre
+
+**Ejemplo - ActividadRepository.java:**
+```java
+public interface ActividadRepository extends JpaRepository<Actividad, Long> {
+    List<Actividad> findByHijoIdAndFecha(Long hijoId, LocalDate fecha);
+    List<Actividad> findByHijoIdAndFechaBetween(Long hijoId, LocalDate inicio, LocalDate fin);
+}
+```
+
+---
+
+# BASE DE DATOS
+
+## Diagrama Entidad-Relación
+
+```
+                    ┌──────────────┐
+                    │    PADRES    │
+                    ├──────────────┤
+                    │ id (PK)      │
+                    │ nombre       │
+                    │ apellido     │
+                    │ email (UK)   │
+                    │ password     │
+                    │ activo       │
+                    │ fecha_registro│
+                    └──────┬───────┘
+                           │
+           ┌───────────────┼───────────────┐
+           │               │               │
+           ▼               ▼               ▼
+┌──────────────────┐ ┌───────────┐ ┌─────────────────┐
+│RELACION_PADRE_HIJO│ │INVITACIONES│ │ NOTIFICACIONES  │
+├──────────────────┤ ├───────────┤ ├─────────────────┤
+│ id (PK)          │ │ id (PK)   │ │ id (PK)         │
+│ padre_id (FK)    │ │ padre_emisor│ │ padre_destinatario│
+│ hijo_id (FK)     │ │ email_co  │ │ tipo            │
+│ es_padre_creador │ │ token     │ │ mensaje         │
+│ color_asignado   │ │ estado    │ │ leida           │
+│ fecha_asignacion │ │ fecha_envio│ │ referencia_id   │
+└────────┬─────────┘ └───────────┘ └─────────────────┘
+         │
+         ▼
+    ┌──────────────┐
+    │    HIJOS     │
+    ├──────────────┤
+    │ id (PK)      │
+    │ nombre       │
+    │ apellido     │
+    │ fecha_nacimiento│
+    │ fecha_registro│
+    └──────┬───────┘
+           │
+     ┌─────┴─────┬──────────────┐
+     ▼           ▼              ▼
+┌───────────┐ ┌──────────────┐ ┌─────────────────┐
+│ACTIVIDADES│ │FECHAS_CUSTODIA│ │SOLICITUDES_CAMBIO│
+├───────────┤ ├──────────────┤ ├─────────────────┤
+│ id (PK)   │ │ id (PK)      │ │ id (PK)         │
+│ hijo_id   │ │ hijo_id      │ │ hijo_id         │
+│ nombre    │ │ fecha        │ │ padre_solicitante│
+│ descripcion│ │ padre_resp   │ │ padre_receptor  │
+│ fecha     │ │ estado       │ │ tipo_solicitud  │
+│ hora_inicio│ │ tipo_custodia│ │ fecha_desde     │
+│ hora_fin  │ │ created_at   │ │ fecha_hasta     │
+│ estado    │ └──────────────┘ │ estado          │
+│ padre_creador│               │ motivo          │
+│ padre_modificador│           │ fecha_solicitud │
+│ created_at │                 │ fecha_resolucion│
+│ updated_at │                 └─────────────────┘
+└───────────┘
+```
+
+## Detalle de Tablas
+
+### Tabla: `padres`
+Almacena los usuarios (padres) del sistema.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria autoincremental |
+| nombre | VARCHAR | NO | Nombre del padre |
+| apellido | VARCHAR | NO | Apellido del padre |
+| email | VARCHAR | NO | Email único (para login) |
+| password | VARCHAR | NO | Contraseña encriptada (BCrypt) |
+| activo | BOOLEAN | NO | Estado de la cuenta |
+| fecha_registro | TIMESTAMP | NO | Fecha de creación |
+
+### Tabla: `hijos`
+Almacena los hijos de los padres.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria |
+| nombre | VARCHAR | NO | Nombre del hijo |
+| apellido | VARCHAR | NO | Apellido del hijo |
+| fecha_nacimiento | DATE | YES | Fecha de nacimiento |
+| fecha_registro | TIMESTAMP | NO | Fecha de creación |
+
+### Tabla: `relacion_padre_hijo`
+Tabla intermedia N:N entre padres e hijos.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria |
+| padre_id | BIGINT | NO | FK a padres |
+| hijo_id | BIGINT | NO | FK a hijos |
+| es_padre_creador | BOOLEAN | NO | Si creó el registro del hijo |
+| color_asignado | VARCHAR | YES | LILA o CELESTE (inmutable) |
+| fecha_asignacion | TIMESTAMP | NO | Fecha de vinculación |
+
+### Tabla: `actividades`
+Actividades programadas para los hijos.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria |
+| hijo_id | BIGINT | NO | FK a hijos |
+| nombre | VARCHAR | NO | Nombre de la actividad |
+| descripcion | VARCHAR | YES | Descripción opcional |
+| fecha | DATE | NO | Fecha de la actividad |
+| hora_inicio | TIME | NO | Hora de inicio |
+| hora_fin | TIME | NO | Hora de fin |
+| estado | VARCHAR | NO | PROGRAMADA, COMPLETADA, CANCELADA |
+| padre_creador_id | BIGINT | NO | Padre que creó |
+| padre_modificador_id | BIGINT | YES | Último que modificó |
+| created_at | TIMESTAMP | NO | Fecha creación |
+| updated_at | TIMESTAMP | YES | Fecha modificación |
+
+### Tabla: `fechas_custodia`
+Fechas de custodia asignadas.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria |
+| hijo_id | BIGINT | NO | FK a hijos |
+| fecha | DATE | NO | Fecha de custodia |
+| padre_responsable_id | BIGINT | NO | Padre con custodia ese día |
+| estado | VARCHAR | NO | ESTABLECIDA, CAMBIO_SOLICITADO |
+| tipo_custodia | VARCHAR | YES | REGULAR, ESPECIAL |
+| created_at | TIMESTAMP | NO | Fecha creación |
+
+### Tabla: `notificaciones`
+Notificaciones entre padres.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria |
+| padre_destinatario_id | BIGINT | NO | Padre que recibe |
+| tipo | VARCHAR | NO | ACTIVIDAD_CREADA, SOLICITUD_CUSTODIA, etc. |
+| mensaje | VARCHAR | NO | Texto de la notificación |
+| referencia_id | BIGINT | NO | ID del objeto relacionado |
+| leida | BOOLEAN | NO | Si fue leída |
+| fecha_creacion | TIMESTAMP | NO | Fecha creación |
+| fecha_lectura | TIMESTAMP | YES | Fecha de lectura |
+
+### Tabla: `invitaciones`
+Invitaciones para vincular co-padres.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria |
+| padre_emisor_id | BIGINT | NO | Padre que invita |
+| email_co_padre | VARCHAR | NO | Email del invitado |
+| nombre_co_padre | VARCHAR | NO | Nombre del invitado |
+| apellido_co_padre | VARCHAR | NO | Apellido del invitado |
+| token | VARCHAR | NO | Token único para aceptar |
+| estado | VARCHAR | NO | PENDIENTE, ACEPTADA, EXPIRADA |
+| fecha_envio | TIMESTAMP | NO | Fecha de envío |
+| fecha_expiracion | TIMESTAMP | NO | Fecha límite |
+| fecha_aceptacion | TIMESTAMP | YES | Fecha de aceptación |
+
+### Tabla: `solicitudes_cambio`
+Solicitudes de custodia entre padres.
+
+| Columna | Tipo | Nullable | Descripción |
+|---------|------|----------|-------------|
+| id | BIGINT | NO | Clave primaria |
+| hijo_id | BIGINT | NO | FK a hijos |
+| padre_solicitante_id | BIGINT | NO | Padre que solicita |
+| padre_receptor_id | BIGINT | NO | Padre que debe aprobar |
+| tipo_solicitud | VARCHAR | NO | ESTABLECER o CAMBIO |
+| fecha_desde | DATE | NO | Inicio del rango |
+| fecha_hasta | DATE | NO | Fin del rango |
+| estado | VARCHAR | NO | PENDIENTE, APROBADA, RECHAZADA |
+| motivo | VARCHAR | YES | Motivo de la solicitud |
+| fecha_solicitud | TIMESTAMP | NO | Fecha de creación |
+| fecha_resolucion | TIMESTAMP | YES | Fecha de resolución |
+
+---
+
+# ENUMS Y ESTADOS
+
+## Estados de Actividad (EstadoActividad)
+- `PROGRAMADA` - Actividad pendiente
+- `COMPLETADA` - Actividad realizada
+- `CANCELADA` - Actividad cancelada
+
+## Estados de Invitación (EstadoInvitacion)
+- `PENDIENTE` - Esperando aceptación
+- `ACEPTADA` - Invitación aceptada
+- `EXPIRADA` - Tiempo límite excedido
+
+## Estados de Solicitud (EstadoSolicitud)
+- `PENDIENTE` - Esperando aprobación
+- `APROBADA` - Aprobada por co-padre
+- `RECHAZADA` - Rechazada por co-padre
+
+## Tipos de Solicitud (TipoSolicitudCustodia)
+- `ESTABLECER` - Establecer nuevas fechas (no puede tocar fechas ya asignadas)
+- `CAMBIO` - Solicitar cambio (puede proponer cualquier fecha)
+
+## Tipos de Notificación (TipoNotificacion)
+- `ACTIVIDAD_CREADA` - Nueva actividad agregada
+- `ACTIVIDAD_EDITADA` - Actividad modificada
+- `ACTIVIDAD_ELIMINADA` - Actividad eliminada
+- `SOLICITUD_CUSTODIA` - Nueva solicitud de custodia
+- `SOLICITUD_APROBADA` - Solicitud aprobada
+- `SOLICITUD_RECHAZADA` - Solicitud rechazada
+
+## Colores de Custodia
+- `LILA` - Color #d8b4fe (morado claro)
+- `CELESTE` - Color #7dd3fc (celeste)
+
+**Regla de negocio:** El primer padre que selecciona color lo conserva permanentemente. El segundo padre recibe automáticamente el color opuesto.
+
+---
+
+# SEGURIDAD
+
+## Autenticación JWT
+
+### Flujo de autenticación:
+1. Usuario envía email/password a `/api/auth/login`
+2. Backend valida credenciales
+3. Si son válidas, genera JWT con claims (email, id)
+4. Frontend almacena token en localStorage
+5. Cada request incluye header `Authorization: Bearer <token>`
+6. Filtro `JwtAuthenticationFilter` valida token en cada petición
+
+### Endpoints públicos (sin autenticación):
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/invitaciones/{token}/aceptar`
+
+### Endpoints protegidos:
+Todos los demás requieren JWT válido.
+
+---
+
+# PWA - Progressive Web App
+
+## Características PWA implementadas:
+- **Service Worker** - Cache de recursos y API calls
+- **Web App Manifest** - Instalable en dispositivos
+- **Offline Support** - Funcionalidad básica sin conexión
+- **Push Notifications** - Preparado para implementar
+
+## Archivos de configuración:
+- `vite.config.js` - Configuración PWA con vite-plugin-pwa
+- `public/manifest.json` - Manifest de la aplicación
+- `public/icons/` - Iconos para home screen
+
+---
+
+# COMANDOS ÚTILES
+
+## Frontend
+```bash
+cd frontend
+npm install          # Instalar dependencias
+npm run dev          # Iniciar servidor desarrollo (puerto 5000)
+npm run build        # Compilar para producción
+```
+
+## Backend
+```bash
+cd backend
+mvn spring-boot:run  # Iniciar servidor (puerto 8080)
+mvn clean install    # Compilar proyecto
+mvn test             # Ejecutar tests
+```
+
+---
+
+# RESUMEN DE ARCHIVOS
+
+| Tipo | Cantidad | Ubicación |
+|------|----------|-----------|
+| Controladores | 8 | backend/src/.../controller/ |
+| Servicios | 9 | backend/src/.../service/ |
+| Repositorios | 8 | backend/src/.../repository/ |
+| Modelos/Entidades | 12 | backend/src/.../model/ |
+| DTOs | 17 | backend/src/.../dto/ |
+| Configuración | 4 | backend/src/.../config/ |
+| Excepciones | 5 | backend/src/.../exception/ |
+| Páginas React | 22 | frontend/src/pages/ |
+| Servicios API | 1 | frontend/src/services/ |
+| Contextos | 1 | frontend/src/context/ |
+
+**Total archivos Java:** 70
+**Total archivos React:** 22
+
+---
+
+*Documentación generada: Enero 2026*
+*Versión del sistema: 1.0.0*
