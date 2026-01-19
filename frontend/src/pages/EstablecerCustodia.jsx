@@ -15,6 +15,7 @@ const EstablecerCustodia = () => {
   const [fechasOcupadas, setFechasOcupadas] = useState([]);
   const [guardando, setGuardando] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [seleccionando, setSeleccionando] = useState('desde'); // 'desde' o 'hasta'
 
   useEffect(() => {
     const hijoGuardado = localStorage.getItem('hijoSeleccionado');
@@ -98,9 +99,35 @@ const EstablecerCustodia = () => {
     return dias;
   };
 
+  const handleDiaClick = (dia) => {
+    if (dia.vacio || dia.ocupada) return;
+    
+    if (seleccionando === 'desde') {
+      setFechaDesde(dia.fecha);
+      setFechaHasta('');
+      setSeleccionando('hasta');
+    } else {
+      if (dia.fecha < fechaDesde) {
+        setFechaDesde(dia.fecha);
+        setFechaHasta(fechaDesde);
+      } else {
+        setFechaHasta(dia.fecha);
+      }
+      setSeleccionando('desde');
+    }
+  };
+
+  const limpiarSeleccion = () => {
+    setFechaDesde('');
+    setFechaHasta('');
+    setSeleccionando('desde');
+  };
+
   const getDiaClase = (dia) => {
     if (dia.vacio || !dia.numero) return 'dia-celda vacio';
     
+    const esDesde = dia.fecha === fechaDesde;
+    const esHasta = dia.fecha === fechaHasta;
     const enRango = fechaDesde && fechaHasta && 
                     dia.fecha >= fechaDesde && 
                     dia.fecha <= fechaHasta;
@@ -110,7 +137,7 @@ const EstablecerCustodia = () => {
       return `dia-celda ${colorClase} ocupado`;
     }
     
-    if (enRango) {
+    if (esDesde || esHasta || enRango) {
       const miColorClase = hijo?.colorPadre === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
       return `dia-celda ${miColorClase} seleccionado`;
     }
@@ -219,8 +246,11 @@ const EstablecerCustodia = () => {
             </button>
           </div>
 
-          <p style={{ textAlign: 'center', marginBottom: '16px', color: '#666' }}>
-            Selecciona el rango de fechas que deseas establecer
+          <p style={{ textAlign: 'center', marginBottom: '8px', color: '#666' }}>
+            Toca los días para seleccionar el rango
+          </p>
+          <p style={{ textAlign: 'center', marginBottom: '8px', color: '#ff9b71', fontSize: '14px', fontWeight: '500' }}>
+            {seleccionando === 'desde' ? '1. Selecciona el primer día' : '2. Selecciona el último día'}
           </p>
           <p style={{ textAlign: 'center', marginBottom: '16px', color: '#999', fontSize: '12px' }}>
             Los días con color ya están ocupados
@@ -237,6 +267,7 @@ const EstablecerCustodia = () => {
               <div
                 key={index}
                 className={getDiaClase(dia)}
+                onClick={() => handleDiaClick(dia)}
                 style={{ 
                   cursor: dia.vacio || dia.ocupada ? 'default' : 'pointer',
                   opacity: dia.ocupada ? 0.7 : 1
@@ -248,50 +279,39 @@ const EstablecerCustodia = () => {
           </div>
         </div>
 
-        <div className="seleccion-fechas" style={{ 
-          margin: '20px 0',
-          padding: '16px',
-          background: 'white',
-          borderRadius: '12px'
-        }}>
-          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>Selecciona el rango de fechas</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>
-                Desde
-              </label>
-              <input 
-                type="date" 
-                value={fechaDesde}
-                onChange={(e) => setFechaDesde(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid #e5e5e5',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>
-                Hasta
-              </label>
-              <input 
-                type="date" 
-                value={fechaHasta}
-                onChange={(e) => setFechaHasta(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid #e5e5e5',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
+        {(fechaDesde || fechaHasta) && (
+          <div style={{ 
+            margin: '20px 0',
+            padding: '16px',
+            background: 'white',
+            borderRadius: '12px',
+            textAlign: 'center'
+          }}>
+            <p style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+              Rango seleccionado:
+            </p>
+            <p style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937' }}>
+              {fechaDesde ? new Date(fechaDesde + 'T00:00:00').toLocaleDateString('es-AR') : '...'} 
+              {' - '} 
+              {fechaHasta ? new Date(fechaHasta + 'T00:00:00').toLocaleDateString('es-AR') : '...'}
+            </p>
+            <button
+              onClick={limpiarSeleccion}
+              style={{
+                marginTop: '8px',
+                padding: '6px 16px',
+                background: 'transparent',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                color: '#666'
+              }}
+            >
+              Limpiar seleccion
+            </button>
           </div>
-        </div>
+        )}
 
         <div className="calendario-acciones">
           <button 

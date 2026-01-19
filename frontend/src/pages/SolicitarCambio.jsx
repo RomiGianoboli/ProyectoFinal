@@ -14,6 +14,7 @@ const SolicitarCambio = () => {
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
   const [enviando, setEnviando] = useState(false);
+  const [seleccionando, setSeleccionando] = useState('desde');
 
   useEffect(() => {
     const hijoGuardado = localStorage.getItem('hijoSeleccionado');
@@ -90,20 +91,52 @@ const SolicitarCambio = () => {
     return dias;
   };
 
+  const handleDiaClick = (dia) => {
+    if (dia.vacio) return;
+    
+    if (seleccionando === 'desde') {
+      setFechaDesde(dia.fecha);
+      setFechaHasta('');
+      setSeleccionando('hasta');
+    } else {
+      if (dia.fecha < fechaDesde) {
+        setFechaDesde(dia.fecha);
+        setFechaHasta(fechaDesde);
+      } else {
+        setFechaHasta(dia.fecha);
+      }
+      setSeleccionando('desde');
+    }
+  };
+
+  const limpiarSeleccion = () => {
+    setFechaDesde('');
+    setFechaHasta('');
+    setSeleccionando('desde');
+  };
+
   const getDiaClase = (dia) => {
     if (dia.vacio || !dia.numero) return 'dia-celda vacio';
     
+    const esDesde = dia.fecha === fechaDesde;
+    const esHasta = dia.fecha === fechaHasta;
     const enRango = fechaDesde && fechaHasta && 
                     dia.fecha >= fechaDesde && 
                     dia.fecha <= fechaHasta;
     
-    if (dia.tieneCustodia) {
+    if (dia.tieneCustodia && !esDesde && !esHasta && !enRango) {
       const colorClase = dia.color === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
-      return `dia-celda ${colorClase} ${enRango ? 'dia-seleccionado' : ''}`;
+      return `dia-celda ${colorClase}`;
     }
     
-    if (enRango) {
-      return 'dia-celda seleccionado';
+    if (esDesde || esHasta || enRango) {
+      const miColorClase = hijo?.colorPadre === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
+      return `dia-celda ${miColorClase} seleccionado`;
+    }
+    
+    if (dia.tieneCustodia) {
+      const colorClase = dia.color === 'LILA' ? 'custodia-lila' : 'custodia-celeste';
+      return `dia-celda ${colorClase}`;
     }
     
     return 'dia-celda';
@@ -195,8 +228,11 @@ const SolicitarCambio = () => {
             </button>
           </div>
 
-          <p style={{ textAlign: 'center', marginBottom: '16px', color: '#666' }}>
-            Selecciona cualquier rango de fechas para solicitar el cambio
+          <p style={{ textAlign: 'center', marginBottom: '8px', color: '#666' }}>
+            Toca los días para seleccionar el rango
+          </p>
+          <p style={{ textAlign: 'center', marginBottom: '8px', color: '#ff9b71', fontSize: '14px', fontWeight: '500' }}>
+            {seleccionando === 'desde' ? '1. Selecciona el primer día' : '2. Selecciona el último día'}
           </p>
           <p style={{ textAlign: 'center', marginBottom: '16px', color: '#999', fontSize: '12px' }}>
             Puedes seleccionar fechas tuyas o del co-padre
@@ -213,6 +249,8 @@ const SolicitarCambio = () => {
               <div
                 key={index}
                 className={getDiaClase(dia)}
+                onClick={() => handleDiaClick(dia)}
+                style={{ cursor: dia.vacio ? 'default' : 'pointer' }}
               >
                 {dia.vacio ? '' : dia.numero}
               </div>
@@ -220,50 +258,39 @@ const SolicitarCambio = () => {
           </div>
         </div>
 
-        <div className="seleccion-fechas" style={{ 
-          margin: '20px 0',
-          padding: '16px',
-          background: 'white',
-          borderRadius: '12px'
-        }}>
-          <h3 style={{ marginBottom: '12px', fontSize: '16px' }}>¿Qué días quieres cambiar?</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>
-                Desde
-              </label>
-              <input 
-                type="date" 
-                value={fechaDesde}
-                onChange={(e) => setFechaDesde(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid #e5e5e5',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '4px', fontSize: '14px', fontWeight: '500' }}>
-                Hasta
-              </label>
-              <input 
-                type="date" 
-                value={fechaHasta}
-                onChange={(e) => setFechaHasta(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid #e5e5e5',
-                  fontSize: '14px'
-                }}
-              />
-            </div>
+        {(fechaDesde || fechaHasta) && (
+          <div style={{ 
+            margin: '20px 0',
+            padding: '16px',
+            background: 'white',
+            borderRadius: '12px',
+            textAlign: 'center'
+          }}>
+            <p style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
+              Rango seleccionado:
+            </p>
+            <p style={{ fontSize: '18px', fontWeight: '600', color: '#1f2937' }}>
+              {fechaDesde ? new Date(fechaDesde + 'T00:00:00').toLocaleDateString('es-AR') : '...'} 
+              {' - '} 
+              {fechaHasta ? new Date(fechaHasta + 'T00:00:00').toLocaleDateString('es-AR') : '...'}
+            </p>
+            <button
+              onClick={limpiarSeleccion}
+              style={{
+                marginTop: '8px',
+                padding: '6px 16px',
+                background: 'transparent',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '12px',
+                color: '#666'
+              }}
+            >
+              Limpiar seleccion
+            </button>
           </div>
-        </div>
+        )}
 
         <div className="calendario-acciones">
           <button 
