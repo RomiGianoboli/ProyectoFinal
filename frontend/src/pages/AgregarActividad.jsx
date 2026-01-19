@@ -8,73 +8,16 @@ const AgregarActividad = () => {
   const location = useLocation();
   const { fecha, hijo, mesAnio } = location.state || {};
   
-  const fechaInicial = fecha || new Date().toISOString().split('T')[0];
-  const [fechaActual, setFechaActual] = useState(() => {
-    const f = new Date(fechaInicial + 'T00:00:00');
-    return new Date(f.getFullYear(), f.getMonth(), 1);
-  });
-  
   const [formData, setFormData] = useState({
     nombre: '',
     descripcion: '',
-    fecha: fechaInicial,
+    fecha: fecha || new Date().toISOString().split('T')[0],
     horaInicio: '09:00',
     horaFin: '10:00',
     hijoId: hijo?.id || null,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const nombresMeses = [
-    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-  ];
-
-  const mesAnterior = () => {
-    const nuevaFecha = new Date(fechaActual);
-    nuevaFecha.setMonth(nuevaFecha.getMonth() - 1);
-    setFechaActual(nuevaFecha);
-  };
-
-  const mesSiguiente = () => {
-    const nuevaFecha = new Date(fechaActual);
-    nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);
-    setFechaActual(nuevaFecha);
-  };
-
-  const getDiasDelMes = () => {
-    const anio = fechaActual.getFullYear();
-    const mes = fechaActual.getMonth();
-    
-    const primerDia = new Date(anio, mes, 1);
-    const ultimoDia = new Date(anio, mes + 1, 0);
-    
-    const diasVaciosInicio = primerDia.getDay();
-    const totalDias = ultimoDia.getDate();
-    
-    const dias = [];
-    
-    for (let i = 0; i < diasVaciosInicio; i++) {
-      dias.push({ vacio: true, key: `vacio-${i}` });
-    }
-    
-    for (let dia = 1; dia <= totalDias; dia++) {
-      const fechaStr = `${anio}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
-      dias.push({
-        numero: dia,
-        vacio: false,
-        fecha: fechaStr,
-        key: `dia-${dia}`
-      });
-    }
-    
-    return dias;
-  };
-
-  const handleDiaClick = (dia) => {
-    if (dia.vacio) return;
-    setFormData({ ...formData, fecha: dia.fecha });
-  };
 
   const handleChange = (e) => {
     setFormData({
