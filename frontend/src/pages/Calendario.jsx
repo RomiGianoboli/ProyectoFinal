@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { calendarioAPI, hijoAPI, notificacionAPI, solicitudAPI } from '../services/api';
+import { calendarioAPI, hijoAPI, notificacionAPI, solicitudAPI, actividadAPI } from '../services/api';
 import './Calendario.css';
 
 const Calendario = () => {
@@ -16,6 +16,7 @@ const Calendario = () => {
   const [guardandoColor, setGuardandoColor] = useState(false);
   const [notificacionesCount, setNotificacionesCount] = useState(0);
   const [solicitudesPendientes, setSolicitudesPendientes] = useState([]);
+  const [actividades, setActividades] = useState([]);
 
   useEffect(() => {
     const hijoGuardado = localStorage.getItem('hijoSeleccionado');
@@ -38,8 +39,18 @@ const Calendario = () => {
       cargarCalendario();
       cargarNotificaciones();
       cargarSolicitudesPendientes();
+      cargarActividades();
     }
   }, [fechaActual, hijo]);
+
+  const cargarActividades = async () => {
+    try {
+      const response = await actividadAPI.listarPorHijo(hijo.id);
+      setActividades(response.data || []);
+    } catch (error) {
+      console.error('Error al cargar actividades:', error);
+    }
+  };
 
   const cargarCalendario = async () => {
     try {
@@ -156,10 +167,14 @@ const Calendario = () => {
         return fecha.getDate() === dia;
       });
       
+      const fechaStr = `${anio}-${(mes + 1).toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
+      const tieneActividad = actividades.some(a => a.fecha === fechaStr);
+      
       dias.push({
         numero: dia,
         key: `dia-${dia}`,
-        colorCustodia: diaData?.colorCustodia || null
+        colorCustodia: diaData?.colorCustodia || null,
+        tieneActividad
       });
     }
     
@@ -290,6 +305,9 @@ const Calendario = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <span className="dia-numero">{dia.numero}</span>
+                    {dia.tieneActividad && (
+                      <span className="actividad-punto"></span>
+                    )}
                   </div>
                 )
               ))}
