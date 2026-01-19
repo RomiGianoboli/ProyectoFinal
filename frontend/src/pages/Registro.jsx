@@ -23,6 +23,21 @@ const Registro = () => {
     });
   };
 
+  const validarPassword = (password) => {
+    const tieneMayuscula = /[A-Z]/.test(password);
+    const tieneMinuscula = /[a-z]/.test(password);
+    const tieneNumero = /[0-9]/.test(password);
+    const tieneMinimo8 = password.length >= 8;
+    
+    return {
+      tieneMayuscula,
+      tieneMinuscula,
+      tieneNumero,
+      tieneMinimo8,
+      esValida: tieneMayuscula && tieneMinuscula && tieneNumero && tieneMinimo8
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -32,8 +47,9 @@ const Registro = () => {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres');
+    const validacion = validarPassword(formData.password);
+    if (!validacion.esValida) {
+      setError('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número');
       return;
     }
 
@@ -121,15 +137,21 @@ const Registro = () => {
               placeholder="Mínimo 8 caracteres"
               required
             />
-            {formData.password.length > 0 && formData.password.length < 8 && (
-              <small style={{ color: '#ff6b6b', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                ⚠️ La contraseña debe tener al menos 8 caracteres ({formData.password.length}/8)
-              </small>
-            )}
-            {formData.password.length >= 8 && (
-              <small style={{ color: '#51cf66', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                ✓ Contraseña válida
-              </small>
+            {formData.password.length > 0 && (
+              <div style={{ marginTop: '8px', fontSize: '12px' }}>
+                <div style={{ color: validarPassword(formData.password).tieneMinimo8 ? '#51cf66' : '#ff6b6b' }}>
+                  {validarPassword(formData.password).tieneMinimo8 ? '✓' : '○'} Mínimo 8 caracteres
+                </div>
+                <div style={{ color: validarPassword(formData.password).tieneMayuscula ? '#51cf66' : '#ff6b6b' }}>
+                  {validarPassword(formData.password).tieneMayuscula ? '✓' : '○'} Al menos una mayúscula
+                </div>
+                <div style={{ color: validarPassword(formData.password).tieneMinuscula ? '#51cf66' : '#ff6b6b' }}>
+                  {validarPassword(formData.password).tieneMinuscula ? '✓' : '○'} Al menos una minúscula
+                </div>
+                <div style={{ color: validarPassword(formData.password).tieneNumero ? '#51cf66' : '#ff6b6b' }}>
+                  {validarPassword(formData.password).tieneNumero ? '✓' : '○'} Al menos un número
+                </div>
+              </div>
             )}
           </div>
 
