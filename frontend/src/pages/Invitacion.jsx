@@ -11,7 +11,7 @@ const Invitacion = () => {
     nombreCoPadre: '',
     apellidoCoPadre: '',
     emailCoPadre: '',
-    hijos: [{ nombre: '', apellido: '' }]
+    hijos: [{ nombre: '', apellido: '', fechaNacimiento: '' }]
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -32,7 +32,7 @@ const Invitacion = () => {
   const agregarOtroHijo = () => {
     setFormData({
       ...formData,
-      hijos: [...formData.hijos, { nombre: '', apellido: '' }]
+      hijos: [...formData.hijos, { nombre: '', apellido: '', fechaNacimiento: '' }]
     });
   };
 
@@ -47,7 +47,8 @@ const Invitacion = () => {
         if (hijo.nombre && hijo.apellido) {
           await hijoAPI.crear({
             nombre: hijo.nombre,
-            apellido: hijo.apellido
+            apellido: hijo.apellido,
+            fechaNacimiento: hijo.fechaNacimiento || null
           });
         }
       }
@@ -132,6 +133,18 @@ const Invitacion = () => {
                   value={hijo.apellido}
                   onChange={(e) => handleHijoChange(index, 'apellido', e.target.value)}
                   placeholder="Apellido"
+                />
+              </div>
+
+              <div className="form-group">
+                <label style={{ fontSize: '14px', color: '#666', marginBottom: '4px', display: 'block' }}>
+                  Fecha de nacimiento
+                </label>
+                <input
+                  type="date"
+                  value={hijo.fechaNacimiento}
+                  onChange={(e) => handleHijoChange(index, 'fechaNacimiento', e.target.value)}
+                  style={{ width: '100%' }}
                 />
               </div>
             </div>
